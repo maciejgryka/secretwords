@@ -1,1 +1,3 @@
 <h2>Main page</h2>
+
+<%= link "New Game", to: Routes.page_path(@conn, :game, @game_session)  %>

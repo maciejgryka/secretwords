@@ -1,6 +1,8 @@
 defmodule SecretwordsWeb.PageController do
   use SecretwordsWeb, :controller
 
+  alias Secretwords.Helpers
+
   def words(num) do
     "data/words.txt"
     |> File.read!()
@@ -10,7 +12,7 @@ defmodule SecretwordsWeb.PageController do
   end
 
   def index(conn, _params) do
-    render(conn, "index.html")
+    render(conn, "index.html", game_session: Helpers.random_game_session)
   end
 
   def game(conn, %{"session_id" => session_id}) do
