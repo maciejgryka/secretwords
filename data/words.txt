@@ -56,7 +56,6 @@ connection
 control
 cook
 copper
-copy
 cork
 copy
 cough
