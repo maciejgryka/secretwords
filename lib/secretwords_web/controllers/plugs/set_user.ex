@@ -11,8 +11,8 @@ defmodule Secretwords.Plugs.SetUser do
 
   defp maybe_put_session(conn, key, value) do
     case get_session(conn, key) do
-      nil -> put_session(conn, key, value)
-      _value -> conn
+       nil -> conn |> put_session(key, value)
+      _val -> conn
     end
   end
 

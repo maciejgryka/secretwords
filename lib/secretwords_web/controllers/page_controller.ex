@@ -29,8 +29,8 @@ defmodule SecretwordsWeb.PageController do
 
   defp ensure_membership(state, user_id) do
     case Enum.find(state.teams, fn {_, members} -> Enum.member?(members, user_id) end) do
-      {_color, _members} -> state
-      nil -> GameState.join(state, Enum.random([:red, :blue]), user_id)
+      {_, _} -> state
+         nil -> state |> GameState.join(Enum.random([:red, :blue]), user_id)
     end
   end
 
