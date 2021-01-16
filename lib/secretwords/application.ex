@@ -17,7 +17,7 @@ defmodule Secretwords.Application do
       SecretwordsWeb.Endpoint,
       # Start a worker by calling: Secretwords.Worker.start_link(arg)
       # {Secretwords.Worker, arg}
-      Secretwords.GameSessionStore
+      Secretwords.GameSessionStore,
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

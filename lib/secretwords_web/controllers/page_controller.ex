@@ -2,6 +2,7 @@ defmodule SecretwordsWeb.PageController do
   use SecretwordsWeb, :controller
 
   alias Secretwords.Helpers
+  alias Secretwords.GameState
 
   def words(num) do
     "data/words.txt"
@@ -16,21 +17,30 @@ defmodule SecretwordsWeb.PageController do
   end
 
   def game(conn, %{"session_id" => session_id}) do
+    user_id = get_session(conn, "user_id")
+
+    state = get_or_create_game(session_id)
+    |> GameState.join(:red, user_id)
+    |> update_game()
+
+    render(conn, "game.html", game_state: state)
+  end
+
+  defp get_or_create_game(session_id) do
     grid_size = 5
+    case :ets.lookup(:game_sessions, session_id) do
+      [{_session_id, state}] -> state
+      [] ->
+        %GameState{
+          session_id: session_id,
+          word_slots: words(1..(grid_size * grid_size)),
+          grid_size: grid_size,
+        } |> update_game()
+    end
+  end
 
-    words =
-      case :ets.lookup(:game_sessions, session_id) do
-        [{_session_id, words}] ->
-          words
-
-        [] ->
-          words = words(1..(grid_size * grid_size))
-          :ets.insert_new(:game_sessions, {session_id, words})
-          words
-          # [{_, words}] = :ets.lookup(:game_sessions, session_id)
-          # words
-      end
-
-    render(conn, "game.html", session_id: session_id, words: words, grid_size: grid_size)
+  defp update_game(game) do
+    true = :ets.insert(:game_sessions, {game.session_id, game})
+    game
   end
 end
