@@ -1,6 +1,6 @@
 defmodule Secretwords.GameState do
   defstruct [
-    session_id: "",
+    game_id: "",
     word_slots: [],
     grid_size: 5,
     teams: %{},

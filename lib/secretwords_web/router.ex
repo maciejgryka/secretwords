@@ -8,6 +8,7 @@ defmodule SecretwordsWeb.Router do
     plug :protect_from_forgery
     plug :put_secure_browser_headers
     plug Secretwords.Plugs.SetUser
+    plug Secretwords.Plugs.SetMembership
   end
 
   pipeline :api do
@@ -19,7 +20,7 @@ defmodule SecretwordsWeb.Router do
 
     get "/", PageController, :index
 
-    get "/g/:session_id", PageController, :game
+    get "/g/:game_id", PageController, :game
   end
 
   # Other scopes may use custom stacks.

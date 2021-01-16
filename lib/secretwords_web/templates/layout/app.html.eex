@@ -15,7 +15,7 @@
     <header>
       <h1>Secretwords</h1>
       <%= if @conn.private.plug_session["user_id"] do %>
-        You are <%= @conn.private.plug_session["user_id"] %>
+        You are <%= @conn.private.plug_session["user_id"] %> (team <%= @conn.private.plug_session["membership"] %>)
       <% end  %>
     </header>
     <main role="main">
