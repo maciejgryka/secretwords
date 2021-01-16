@@ -21,10 +21,17 @@ defmodule SecretwordsWeb.PageController do
     conn = put_session(conn, "game_id", game_id)
 
     state = get_or_create_game(game_id)
-    |> GameState.join(:red, user_id)
+    |> ensure_membership(user_id)
     |> update_game()
 
     render(conn, "game.html", game_state: state)
+  end
+
+  defp ensure_membership(state, user_id) do
+    case Enum.find(state.teams, fn {_, members} -> Enum.member?(members, user_id) end) do
+      {_color, _members} -> state
+      nil -> GameState.join(state, Enum.random([:red, :blue]), user_id)
+    end
   end
 
   defp get_or_create_game(game_id) do
@@ -36,7 +43,7 @@ defmodule SecretwordsWeb.PageController do
           game_id: game_id,
           word_slots: words(1..(grid_size * grid_size)),
           grid_size: grid_size,
-        } |> update_game()
+        }
     end
   end
 
