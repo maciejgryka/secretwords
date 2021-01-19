@@ -16,7 +16,7 @@ defmodule SecretwordsWeb.PageController do
     render(conn, "index.html", game_session: Helpers.random_game_session)
   end
 
-  def game(conn, %{"game_id" => game_id}) do
+  def game(conn, %{"id" => game_id}) do
     user_id = get_session(conn, "user_id")
     conn = put_session(conn, "game_id", game_id)
 
@@ -25,6 +25,21 @@ defmodule SecretwordsWeb.PageController do
     |> update_game()
 
     render(conn, "game.html", game_state: state)
+  end
+
+  def switch(conn, %{"id" => game_id}) do
+    user_id = get_session(conn, "user_id")
+    game = get_or_create_game(game_id)
+
+    current_team = GameState.membership(game, user_id)
+    new_team = if current_team == :red, do: :blue, else: :red
+
+    game
+    |> GameState.leave(current_team, user_id)
+    |> GameState.join(new_team, user_id)
+    |> update_game()
+
+    redirect(conn, to: "/g/" <> game_id)
   end
 
   defp ensure_membership(state, user_id) do
@@ -40,7 +55,7 @@ defmodule SecretwordsWeb.PageController do
       [{_game_id, state}] -> state
       [] ->
         %GameState{
-          game_id: game_id,
+          id: game_id,
           word_slots: words(1..(grid_size * grid_size)),
           grid_size: grid_size,
         }
@@ -48,7 +63,7 @@ defmodule SecretwordsWeb.PageController do
   end
 
   defp update_game(game) do
-    true = :ets.insert(:game_sessions, {game.game_id, game})
+    true = :ets.insert(:game_sessions, {game.id, game})
     game
   end
 end

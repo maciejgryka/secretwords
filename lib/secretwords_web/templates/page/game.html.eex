@@ -1,4 +1,4 @@
-<h2>Game: <%= @game_state.game_id %></h2>
+<h2>Game: <%= @game_state.id %></h2>
 
 <table>
   <%= for row <- Enum.chunk_every(@game_state.word_slots, @game_state.grid_size) do %>
@@ -10,12 +10,15 @@
   <% end %>
 </table>
 
-<h3>Red:</h3>
-<%= for member <- Enum.sort(Map.get(@game_state.teams, :red, [])) do %>
-  <p <%= if @game_state.leaders[:red] == member do %>class="team-leader"<% end %>><%= member %></p>
-<% end %>
-
-<h3>Blue:</h3>
-<%= for member <- Enum.sort(Map.get(@game_state.teams, :blue, [])) do %>
-  <p <%= if @game_state.leaders[:blue] == member do %>class="team-leader"<% end %>><%= member %></p>
+<%= for {team, members} <- @game_state.teams do %>
+  <h3><%= team |> Atom.to_string |> String.capitalize %>:</h3>
+  <%= for member <- Enum.sort(members) do %>
+    <p>
+      <span <%= if @game_state.leaders[team] == member do %>class="team-leader"<% end %>><%= member %></span>
+      <%= if member == @conn.private.plug_session["user_id"] do %>
+        (you)
+        <%= button "Switch teams", to: Routes.page_path(@conn, :switch, @game_state), method: :put %>
+      <% end %>
+    </p>
+  <% end %>
 <% end %>

@@ -5,6 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Secretwords</title>
+    <script type="text/javascript" src="<%= Routes.static_path(@conn, "/js/app.js") %>"></script>
     <style type="text/css">
       .team-leader {
         color: purple;
@@ -16,7 +17,7 @@
     <header>
       <h1>Secretwords</h1>
       <%= if @conn.private.plug_session["user_id"] do %>
-        You are <%= @conn.private.plug_session["user_id"] %> (team <%= @conn.private.plug_session["membership"] %>)
+        You are <%= @conn.private.plug_session["user_id"] %>
       <% end  %>
     </header>
     <main role="main">
