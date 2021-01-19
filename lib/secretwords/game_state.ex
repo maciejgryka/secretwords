@@ -1,4 +1,6 @@
 defmodule Secretwords.GameState do
+  @type t :: map
+
   defstruct [
     id: "",
     word_slots: [],

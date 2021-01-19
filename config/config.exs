@@ -16,7 +16,7 @@ config :secretwords, SecretwordsWeb.Endpoint,
   secret_key_base: "ZTijejzwQYQGasNvFxC1/AfnEu/3IGuoSkC1aVqwATr1pnUpg58l4cPVlW3Yed20",
   render_errors: [view: SecretwordsWeb.ErrorView, accepts: ~w(html json), layout: false],
   pubsub_server: Secretwords.PubSub,
-  live_view: [signing_salt: "BXzVr3ai"]
+  live_view: [signing_salt: "ELxYfhz1EVyTfZ+PxgHyec18G/kwdI2R"]
 
 # Configures Elixir's Logger
 config :logger, :console,
