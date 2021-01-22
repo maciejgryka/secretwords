@@ -7,9 +7,6 @@
 # General application configuration
 use Mix.Config
 
-config :secretwords,
-  ecto_repos: [Secretwords.Repo]
-
 # Configures the endpoint
 config :secretwords, SecretwordsWeb.Endpoint,
   url: [host: "localhost"],
