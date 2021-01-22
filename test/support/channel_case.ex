@@ -27,8 +27,4 @@ defmodule SecretwordsWeb.ChannelCase do
       @endpoint SecretwordsWeb.Endpoint
     end
   end
-
-  setup tags do
-    :ok
-  end
 end

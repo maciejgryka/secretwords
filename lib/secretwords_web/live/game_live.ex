@@ -5,9 +5,6 @@ defmodule SecretwordsWeb.GameLive do
 
   def mount(%{"id" => game_id}, session, socket) do
     game = Helpers.get_or_create_game(game_id)
-    IO.inspect("+++")
-    IO.inspect(game)
-    IO.inspect("+++")
     {:ok, assign(socket, [game: game, user_id: session["user_id"]])}
   end
 
@@ -15,11 +12,6 @@ defmodule SecretwordsWeb.GameLive do
     game = Helpers.get_or_create_game(socket.assigns.game.id)
     |> GameState.switch_teams(socket.assigns["user_id"])
     |> Helpers.update_game()
-
-    IO.inspect("+++")
-    IO.inspect(game)
-    IO.inspect(socket.assings["user_id"])
-    IO.inspect("+++")
 
     {:noreply, assign(socket, :game, game)}
   end
@@ -32,7 +24,11 @@ defmodule SecretwordsWeb.GameLive do
       <%= for row <- Enum.chunk_every(@game.word_slots, @game.grid_size) do %>
         <tr>
           <%= for ws <- row do %>
-            <td class="word"><%= ws.word %></td>
+            <td
+              class="word<%= if ws.used do %> used<% end %>"
+            >
+              <%= ws.word %>
+            </td>
           <% end %>
         </tr>
       <% end %>
