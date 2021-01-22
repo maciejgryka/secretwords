@@ -46,7 +46,7 @@ defmodule SecretwordsWeb do
   def live_view do
     quote do
       use Phoenix.LiveView,
-        layout: {SecretwordsWeb.LayouzView, "live.html"}
+        layout: {SecretwordsWeb.LayoutView, "live.html"}
 
       unquote(view_helpers())
     end

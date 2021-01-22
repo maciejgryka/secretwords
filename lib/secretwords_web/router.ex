@@ -23,6 +23,8 @@ defmodule SecretwordsWeb.Router do
 
     get "/g/:id", PageController, :game
     put "/g/:id/switch", PageController, :switch
+
+    live "/l/g/:id", GameLive
   end
 
   # Other scopes may use custom stacks.
