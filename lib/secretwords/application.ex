@@ -7,8 +7,6 @@ defmodule Secretwords.Application do
 
   def start(_type, _args) do
     children = [
-      # Start the Ecto repository
-      Secretwords.Repo,
       # Start the Telemetry supervisor
       SecretwordsWeb.Telemetry,
       # Start the PubSub system

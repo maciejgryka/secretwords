@@ -29,12 +29,6 @@ defmodule SecretwordsWeb.ChannelCase do
   end
 
   setup tags do
-    :ok = Ecto.Adapters.SQL.Sandbox.checkout(Secretwords.Repo)
-
-    unless tags[:async] do
-      Ecto.Adapters.SQL.Sandbox.mode(Secretwords.Repo, {:shared, self()})
-    end
-
     :ok
   end
 end
