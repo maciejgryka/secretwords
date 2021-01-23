@@ -9,6 +9,8 @@ defmodule SecretwordsWeb.GameLive do
     |> GameState.ensure_membership(user_id)
     |> Helpers.update_game()
 
+    if connected?(socket), do: Phoenix.PubSub.subscribe(Secretwords.PubSub, game_id)
+
     {:ok, assign(socket, [game: game, user_id: user_id])}
   end
 
@@ -26,6 +28,10 @@ defmodule SecretwordsWeb.GameLive do
     |> Helpers.update_game()
 
     {:noreply, assign(socket, :game, game)}
+  end
+
+  def handle_info({:game_updated, game_id}, socket) do
+    {:noreply, assign(socket, :game, Helpers.get_or_create_game(game_id))}
   end
 
   def render(assigns) do

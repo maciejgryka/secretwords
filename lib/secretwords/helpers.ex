@@ -32,6 +32,7 @@ defmodule Secretwords.Helpers do
 
   def update_game(game) do
     true = :ets.insert(:game_sessions, {game.id, game})
+    :ok = Phoenix.PubSub.broadcast!(Secretwords.PubSub, game.id, {:game_updated, game.id})
     game
   end
 end
