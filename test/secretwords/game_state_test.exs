@@ -1,7 +1,7 @@
 defmodule Secretwords.GameStateTest do
   use ExUnit.Case
 
-  alias Secretwords.GameState
+  alias Secretwords.{GameState, WordSlot}
 
   describe "join" do
     test "joins the right team" do
@@ -65,6 +65,34 @@ defmodule Secretwords.GameStateTest do
         :red,
         "u4"
       ) == %GameState{teams: %{red: ["u1", "u2"], blue: ["u3"]}}
+    end
+  end
+
+  describe "choose_word" do
+    test "chooses a word" do
+      assert GameState.choose_word(
+        %GameState{word_slots: [
+          %WordSlot{word: "one", used: false},
+          %WordSlot{word: "two", used: false},
+        ]},
+        "two"
+      ) == %GameState{word_slots: [
+        %WordSlot{word: "one", used: false},
+        %WordSlot{word: "two", used: true},
+      ]}
+    end
+
+    test "does nothing for a non-existent word" do
+      assert GameState.choose_word(
+        %GameState{word_slots: [
+          %WordSlot{word: "one", used: false},
+          %WordSlot{word: "two", used: false},
+        ]},
+        "three"
+      ) == %GameState{word_slots: [
+        %WordSlot{word: "one", used: false},
+        %WordSlot{word: "two", used: false},
+      ]}
     end
   end
 end

@@ -51,4 +51,15 @@ defmodule Secretwords.GameState do
   defp update_members(game, color, new_members) do
     %Secretwords.GameState{game | teams: %{game.teams | color => new_members}}
   end
+
+  def choose_word(game, word) do
+    new_words = Enum.map game.word_slots, fn ws ->
+      if ws.word == word do
+        %{ws | used: true}
+      else
+        ws
+      end
+    end
+    %{game | word_slots: new_words}
+  end
 end

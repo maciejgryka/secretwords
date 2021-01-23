@@ -37,8 +37,11 @@
   font-weight: bold;
 }
 
+
 .word {
-  .used {
-    color: gray;
-  }
+  cursor: pointer;
+}
+
+.word.used {
+  color: gray;
 }

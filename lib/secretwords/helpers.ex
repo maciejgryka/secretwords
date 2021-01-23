@@ -23,11 +23,11 @@ defmodule Secretwords.Helpers do
     end
   end
 
-  def random_game_session() do
-    length = 8
+  def random_string(length \\ 8) do
     :crypto.strong_rand_bytes(length)
     |> Base.url_encode64
     |> binary_part(0, length)
+    |> String.downcase
   end
 
   def update_game(game) do

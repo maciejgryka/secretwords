@@ -1,12 +1,14 @@
 defmodule Secretwords.Plugs.SetUser do
   import Plug.Conn
 
+  alias Secretwords.Helpers
+
   def init(_params) do
   end
 
   def call(conn, _params) do
     conn
-    |> maybe_put_session("user_id", random_username())
+    |> maybe_put_session("user_id", Helpers.random_string())
   end
 
   defp maybe_put_session(conn, key, value) do
@@ -14,13 +16,5 @@ defmodule Secretwords.Plugs.SetUser do
        nil -> conn |> put_session(key, value)
       _val -> conn
     end
-  end
-
-  defp random_username() do
-    length = 8
-    :crypto.strong_rand_bytes(length)
-    |> Base.url_encode64
-    |> binary_part(0, length)
-    |> String.downcase
   end
 end

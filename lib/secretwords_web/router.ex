@@ -20,11 +20,7 @@ defmodule SecretwordsWeb.Router do
     pipe_through :browser
 
     get "/", PageController, :index
-
-    get "/g/:id", PageController, :game
-    put "/g/:id/switch", PageController, :switch
-
-    live "/l/g/:id", GameLive
+    live "/g/:id", GameLive
   end
 
   # Other scopes may use custom stacks.
