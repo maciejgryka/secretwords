@@ -53,7 +53,7 @@ defmodule Secretwords.GameStateTest do
       ) == %GameState{teams: %{red: ["u1", "u2"], blue: []}}
     end
 
-    test "does nothing if the giiven user is not a member" do
+    test "does nothing if the given user is not a member" do
       assert GameState.leave(
         %GameState{teams: %{red: ["u1", "u2"], blue: ["u3"]}},
         :red,

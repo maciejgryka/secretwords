@@ -19,12 +19,6 @@ defmodule Secretwords.GameState do
   def join(game, color, user_id) do
     current_members = Map.get(game.teams, color, [])
 
-    # if the team being joined is empty, make user_id the leader
-    game = case current_members do
-      [] -> %{game | leaders: Map.put(game.leaders, color, user_id)}
-        _ -> game
-    end
-
     update_members(game, color, Enum.uniq([user_id | current_members]))
   end
 
@@ -50,6 +44,19 @@ defmodule Secretwords.GameState do
 
   defp update_members(game, color, new_members) do
     %Secretwords.GameState{game | teams: %{game.teams | color => new_members}}
+    |> ensure_leders()
+  end
+
+  defp ensure_leders(game) do
+    game = case length(game.teams[:red]) do
+      1 -> %{game | leaders: %{game.leaders | red: game.teams[:red] |> List.first}}
+      _ -> game
+    end
+    game = case length(game.teams[:blue]) do
+      1 -> %{game | leaders: %{game.leaders | blue: game.teams[:blue] |> List.first}}
+      _ -> game
+    end
+    game
   end
 
   def choose_word(game, word) do
