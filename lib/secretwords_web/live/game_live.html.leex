@@ -1,7 +1,13 @@
 <h2>Game: <%= @game.id %></h2>
 <h3>
     Round <%= @game.round %>
-    <button phx-click="next_round">
+    <button
+        <%= if @derived.enough_members do %>
+            phx-click="next_round"
+        <% else %>
+            disabled
+        <% end %>
+    >
     <%= if @game.round == 0 do %>
         Start game
     <% else %>
@@ -15,7 +21,7 @@
     <tr>
         <%= for ws <- row do %>
         <td
-            class="word<%= if ws.used do %> used<% end %> <%= ws.type %>"
+            class="word<%= if ws.used do %> used<% end %> <%= if @derived.is_leader do %><%= ws.type %><% end %>"
             <%= if !ws.used do %>
             phx-click="choose_word"
             phx-value-word="<%= ws.word %>"
@@ -27,6 +33,10 @@
     </tr>
     <% end %>
 </table>
+
+<%= if !@derived.enough_members do %>
+<p>Need at least 2 players on each team to start the game.</p>
+<% end %>
 
 <%= for {team, members} <- @game.teams do %>
     <h3><%= team |> Atom.to_string |> String.capitalize %>:</h3>
@@ -40,4 +50,3 @@
     </p>
     <% end %>
 <% end %>
-"""

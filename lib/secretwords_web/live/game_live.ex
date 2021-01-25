@@ -11,7 +11,15 @@ defmodule SecretwordsWeb.GameLive do
 
     if connected?(socket), do: Phoenix.PubSub.subscribe(Secretwords.PubSub, game_id)
 
-    {:ok, assign(socket, [game: game, user_id: user_id])}
+    {
+      :ok,
+      assign(
+        socket,
+        game: game,
+        derived: derived_state(game, user_id),
+        user_id: user_id
+      )
+    }
   end
 
   def handle_event("switch_teams", _value, socket) do
@@ -19,7 +27,7 @@ defmodule SecretwordsWeb.GameLive do
     |> GameState.switch_teams(socket.assigns.user_id)
     |> Helpers.update_game()
 
-    {:noreply, assign(socket, :game, game)}
+    {:noreply, update_and_assign(socket, game)}
   end
 
   def handle_event("choose_word", %{"word" => word}, socket) do
@@ -27,7 +35,7 @@ defmodule SecretwordsWeb.GameLive do
     |> GameState.choose_word(word)
     |> Helpers.update_game()
 
-    {:noreply, assign(socket, :game, game)}
+    {:noreply, update_and_assign(socket, game)}
   end
 
   def handle_event("next_round", _value, socket) do
@@ -36,10 +44,22 @@ defmodule SecretwordsWeb.GameLive do
     |> Helpers.update_game
     IO.inspect(game.round)
 
-    {:noreply, assign(socket, :game, game)}
+    {:noreply, update_and_assign(socket, game)}
   end
 
   def handle_info({:game_updated, game_id}, socket) do
-    {:noreply, assign(socket, :game, Helpers.get_or_create_game(game_id))}
+    game = Helpers.get_or_create_game(game_id)
+    {:noreply, assign(socket, :game, game)}
+  end
+
+  defp update_and_assign(socket, game) do
+    assign(socket, game: game, derived: derived_state(game, socket.assigns.user_id))
+  end
+
+  defp derived_state(game, user_id) do
+    %{
+      is_leader: user_id in Map.values(game.leaders),
+      enough_members: (game.teams |> Map.values |> Enum.map(&length/1) |> Enum.min) > 1
+    }
   end
 end
