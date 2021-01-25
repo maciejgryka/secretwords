@@ -56,8 +56,4 @@
     <% end %>
 <% end %>
 
-<pre>
-    <%= for action <- @game.activity do %>
-        <%= action %>
-    <% end %>
-</pre>
+<%= live_component @socket, SecretwordsWeb.ActivityLogComponent, activity: @game.activity %>
