@@ -1,13 +1,33 @@
 defmodule Secretwords.Helpers do
   alias Secretwords.{GameState, WordSlot}
 
-  def words(num) do
-    "data/words.txt"
+  defp words(num) do
+    words = "data/words.txt"
     |> File.read!()
     |> String.split("\n", trim: true)
     |> Enum.shuffle()
     |> Enum.slice(num)
-    |> Enum.map(fn w -> %WordSlot{word: w} end)
+
+    types = word_slot_types()
+
+    make_word_slots(words, types)
+  end
+
+  def make_word_slots(words, types) do
+    [words, types]
+    |> Enum.zip
+    |> Enum.map(fn {word, type} -> %WordSlot{word: word, type: type} end)
+  end
+
+  def word_slot_types() do
+    [
+      :neutral, :neutral, :neutral, :neutral, :neutral,
+      :neutral, :neutral, :neutral, :neutral, :neutral,
+      :neutral, :neutral, :neutral, :neutral,
+      :red, :red, :red, :red, :red,
+      :blue, :blue, :blue, :blue, :blue,
+      :killer,
+    ] |> Enum.shuffle
   end
 
   def get_or_create_game(game_id) do

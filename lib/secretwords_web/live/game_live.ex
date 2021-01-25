@@ -43,9 +43,11 @@ defmodule SecretwordsWeb.GameLive do
         <tr>
           <%= for ws <- row do %>
             <td
-              class="word<%= if ws.used do %> used<% end %>"
-              phx-click="choose_word"
-              phx-value-word="<%= ws.word %>"
+              class="word<%= if ws.used do %> used<% end %> <%= ws.type %>"
+              <%= if !ws.used do %>
+                phx-click="choose_word"
+                phx-value-word="<%= ws.word %>"
+              <% end %>
             >
               <%= ws.word %>
             </td>

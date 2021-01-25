@@ -43,20 +43,31 @@ defmodule Secretwords.GameState do
   end
 
   defp update_members(game, color, new_members) do
-    %Secretwords.GameState{game | teams: %{game.teams | color => new_members}}
-    |> ensure_leders()
+    %__MODULE__{game | teams: %{game.teams | color => new_members}}
+    |> ensure_leaders()
   end
 
-  defp ensure_leders(game) do
-    game = case length(game.teams[:red]) do
-      1 -> %{game | leaders: %{game.leaders | red: game.teams[:red] |> List.first}}
-      _ -> game
+  def ensure_leaders(game) do
+    new_leaders = game.teams
+      |> Enum.map(fn {color, members} ->
+        {color, determine_leader(game.leaders[color], members)}
+      end)
+      |> Enum.filter(fn {_, members} -> !is_nil(members) end)
+      |> Map.new
+
+    %__MODULE__{game | leaders: new_leaders}
+  end
+
+  defp determine_leader(current_leader, members) do
+    case length(members) do
+      0 -> nil
+      1 -> List.first(members)
+      _ -> if !is_nil(current_leader) do
+        current_leader
+      else
+        List.first(members)
+      end
     end
-    game = case length(game.teams[:blue]) do
-      1 -> %{game | leaders: %{game.leaders | blue: game.teams[:blue] |> List.first}}
-      _ -> game
-    end
-    game
   end
 
   def choose_word(game, word) do

@@ -37,11 +37,28 @@
   font-weight: bold;
 }
 
-
 .word {
   cursor: pointer;
+  background-color: #fcf8e3;
+  text-align: center;
+  width: 120px;
+  height: 80px;
 }
 
 .word.used {
-  color: gray;
+  opacity: 0.3;
+  cursor: default;
+}
+
+.word.red {
+  background-color: #a94442;
+}
+
+.word.blue {
+  background-color: #bce8f1
+}
+
+.word.killer {
+  background-color: black;
+  color: white;
 }
