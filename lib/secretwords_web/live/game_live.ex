@@ -30,45 +30,16 @@ defmodule SecretwordsWeb.GameLive do
     {:noreply, assign(socket, :game, game)}
   end
 
+  def handle_event("next_round", _value, socket) do
+    game = Helpers.get_or_create_game(socket.assigns.game.id)
+    |> GameState.next_round
+    |> Helpers.update_game
+    IO.inspect(game.round)
+
+    {:noreply, assign(socket, :game, game)}
+  end
+
   def handle_info({:game_updated, game_id}, socket) do
     {:noreply, assign(socket, :game, Helpers.get_or_create_game(game_id))}
   end
-
-  def render(assigns) do
-    ~L"""
-    <h2>Game: <%= @game.id %></h2>
-
-    <table>
-      <%= for row <- Enum.chunk_every(@game.word_slots, @game.grid_size) do %>
-        <tr>
-          <%= for ws <- row do %>
-            <td
-              class="word<%= if ws.used do %> used<% end %> <%= ws.type %>"
-              <%= if !ws.used do %>
-                phx-click="choose_word"
-                phx-value-word="<%= ws.word %>"
-              <% end %>
-            >
-              <%= ws.word %>
-            </td>
-          <% end %>
-        </tr>
-      <% end %>
-    </table>
-
-    <%= for {team, members} <- @game.teams do %>
-      <h3><%= team |> Atom.to_string |> String.capitalize %>:</h3>
-      <%= for member <- Enum.sort(members) do %>
-        <p>
-          <span <%= if @game.leaders[team] == member do %>class="team-leader"<% end %>><%= member %></span>
-          <%= if member == @user_id do %>
-            (you)
-            <button phx-click="switch_teams">Switch teams</button>
-          <% end %>
-        </p>
-      <% end %>
-    <% end %>
-    """
-  end
-
 end
