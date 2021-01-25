@@ -2,7 +2,7 @@
 <h3>
     Round <%= @game.round %>
     <button
-        <%= if @derived.enough_members do %>
+        <%= if @d.enough_members do %>
             phx-click="next_round"
         <% else %>
             disabled
@@ -21,10 +21,15 @@
     <tr>
         <%= for ws <- row do %>
         <td
-            class="word<%= if ws.used do %> used<% end %> <%= if @derived.is_leader do %><%= ws.type %><% end %>"
-            <%= if !ws.used do %>
-            phx-click="choose_word"
-            phx-value-word="<%= ws.word %>"
+            class="
+                word
+                <%= if ws.used do %> used<% end %>
+                <%= if @d.game_started && @d.is_leader do %> <%= ws.type %><% end %>
+                <%= if @d.game_started do %> selectable<% end %>
+            "
+            <%= if @d.game_started && !ws.used do %>
+                phx-click="choose_word"
+                phx-value-word="<%= ws.word %>"
             <% end %>
         >
             <%= ws.word %>
@@ -34,7 +39,7 @@
     <% end %>
 </table>
 
-<%= if !@derived.enough_members do %>
+<%= if !@d.enough_members do %>
 <p>Need at least <%= @min_players %> players on each team to start the game.</p>
 <% end %>
 
@@ -50,3 +55,9 @@
     </p>
     <% end %>
 <% end %>
+
+<pre>
+    <%= for action <- @game.activity do %>
+        <%= action %>
+    <% end %>
+</pre>

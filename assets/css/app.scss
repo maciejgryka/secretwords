@@ -38,11 +38,14 @@
 }
 
 .word {
-  cursor: pointer;
   background-color: #fcf8e3;
   text-align: center;
   width: 120px;
   height: 80px;
+}
+
+.word.selectable {
+  cursor: pointer;
 }
 
 .word.used {

@@ -20,8 +20,7 @@ defmodule SecretwordsWeb.GameLive do
       socket
       |> assign(min_players: @min_players)
       |> assign(user_id: user_id)
-      |> assign(game: game)
-      |> assign(derived: derived_state(game, user_id))
+      |> update_and_assign(game)
 
       {:ok, socket}
   end
@@ -60,7 +59,7 @@ defmodule SecretwordsWeb.GameLive do
   defp update_and_assign(socket, game) do
     socket
     |> assign(game: game)
-    |> assign(derived: derived_state(game, socket.assigns.user_id))
+    |> assign(d: derived_state(game, socket.assigns.user_id))
   end
 
   defp derived_state(game, user_id) do
@@ -72,6 +71,7 @@ defmodule SecretwordsWeb.GameLive do
         |> Enum.map(&length/1)
         |> Enum.min
       ) >= @min_players,
+      game_started: game.round > 0,
     }
   end
 end

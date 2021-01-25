@@ -8,21 +8,28 @@ defmodule Secretwords.GameState do
     teams: %{red: [], blue: []},
     leaders: %{},
     round: 0,
+    activity: [],
   ]
 
   def next_round(game) do
-    %__MODULE__{game | round: game.round + 1}
+    new_round = game.round + 1
+    message = "starting round " <> to_string(new_round)
+
+    %__MODULE__{game | round: new_round}
+    |> log_activity(message)
   end
 
   def choose_word(game, word) do
-    new_words = Enum.map game.word_slots, fn ws ->
-      if ws.word == word do
-        %{ws | used: true}
-      else
-        ws
+    new_words = game.word_slots |> Enum.map(fn ws ->
+      case ws.word == word do
+        true -> %{ws | used: true}
+        false -> ws
       end
-    end
+    end)
+    message = "\"" <> word <> "\" selected"
+
     %{game | word_slots: new_words}
+    |> log_activity(message)
   end
 
   def membership(game, user_id) do
@@ -42,13 +49,23 @@ defmodule Secretwords.GameState do
   def join(game, color, user_id) do
     current_members = Map.get(game.teams, color, [])
     updated_members = Enum.uniq([user_id | current_members])
-    update_members(game, color, updated_members)
+    message = user_id <> " joined the " <> Atom.to_string(color) <> " team"
+
+    game
+    # log joining first, because update_members logs leadership changes
+    |> log_activity(message)
+    |> update_members(color, updated_members)
   end
 
   def leave(game, color, user_id) do
     current_members = game.teams[color]
     updated_members = Enum.reject(current_members, &(&1 == user_id))
-    update_members(game, color, updated_members)
+    message = user_id <> " left the " <> Atom.to_string(color) <> " team"
+
+    game
+    # log leaving first, because update_members logs leadership changes
+    |> log_activity(message)
+    |> update_members(color, updated_members)
   end
 
   defp update_members(game, color, new_members) do
@@ -57,14 +74,16 @@ defmodule Secretwords.GameState do
   end
 
   def ensure_leaders(game) do
-    new_leaders = game.teams
+    new_leaders =
+      game.teams
       |> Enum.map(fn {color, members} ->
         {color, determine_leader(game.leaders[color], members)}
       end)
-      |> Enum.filter(fn {_, members} -> !is_nil(members) end)
+      |> Enum.reject(fn {_, members} -> is_nil(members) end)
       |> Map.new
 
-    %__MODULE__{game | leaders: new_leaders}
+    game
+    |> set_leaders(new_leaders)
   end
 
   defp determine_leader(current_leader, members) do
@@ -79,6 +98,20 @@ defmodule Secretwords.GameState do
     end
   end
 
+  defp set_leaders(game, leaders) do
+    # message for each new leader
+    messages =
+      leaders
+      |> Enum.filter(fn {color, user_id} -> game.leaders[color] != user_id end)
+      |> Enum.map(fn {color, user_id} ->
+          user_id <> " leads the " <> Atom.to_string(color) <> " team"
+      end)
+      |> Enum.reject(&is_nil/1)
+
+    %__MODULE__{game | leaders: leaders}
+    |> log_activity(messages)
+  end
+
   def switch_teams(game, user_id) do
     current_team = membership(game, user_id)
     new_team = if current_team == :red, do: :blue, else: :red
@@ -86,5 +119,13 @@ defmodule Secretwords.GameState do
     game
     |> leave(current_team, user_id)
     |> join(new_team, user_id)
+  end
+
+  defp log_activity(game, messages) when is_list(messages) do
+    %__MODULE__{game | activity: messages ++ game.activity}
+  end
+
+  defp log_activity(game, message) do
+    %__MODULE__{game | activity: [message | game.activity]}
   end
 end
