@@ -35,7 +35,7 @@
 </table>
 
 <%= if !@derived.enough_members do %>
-<p>Need at least 2 players on each team to start the game.</p>
+<p>Need at least <%= @min_players %> players on each team to start the game.</p>
 <% end %>
 
 <%= for {team, members} <- @game.teams do %>
