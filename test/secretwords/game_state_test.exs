@@ -76,10 +76,10 @@ defmodule Secretwords.GameStateTest do
           %WordSlot{word: "two", used: false},
         ]},
         "two"
-      ) == %GameState{word_slots: [
+      ).word_slots == [
         %WordSlot{word: "one", used: false},
         %WordSlot{word: "two", used: true},
-      ]}
+      ]
     end
 
     test "does nothing for a non-existent word" do
@@ -89,10 +89,10 @@ defmodule Secretwords.GameStateTest do
           %WordSlot{word: "two", used: false},
         ]},
         "three"
-      ) == %GameState{word_slots: [
+      ).word_slots == [
         %WordSlot{word: "one", used: false},
         %WordSlot{word: "two", used: false},
-      ]}
+      ]
     end
   end
 

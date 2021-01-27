@@ -42,7 +42,8 @@ defmodule Secretwords.MixProject do
       {:jason, "~> 1.0"},
       {:plug_cowboy, "~> 2.0"},
       {:phoenix_live_view, "~> 0.15.3"},
-      {:floki, ">= 0.27.0", only: :test}
+      {:floki, ">= 0.27.0", only: :test},
+      {:mix_test_watch, "~> 1.0", only: :dev, runtime: false},
     ]
   end
 end
