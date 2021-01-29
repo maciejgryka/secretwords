@@ -1,15 +1,13 @@
 defmodule Secretwords.GameState do
   @type t :: map
 
-  defstruct [
-    id: "",
-    word_slots: [],
-    grid_size: 5,
-    teams: %{red: [], blue: []},
-    leaders: %{},
-    round: 0,
-    activity: [],
-  ]
+  defstruct id: "",
+            word_slots: [],
+            grid_size: 5,
+            teams: %{red: [], blue: []},
+            leaders: %{},
+            round: 0,
+            activity: []
 
   def next_round(game) do
     new_round = game.round + 1
@@ -20,12 +18,15 @@ defmodule Secretwords.GameState do
   end
 
   def choose_word(game, word) do
-    new_words = game.word_slots |> Enum.map(fn ws ->
-      case ws.word == word do
-        true -> %{ws | used: true}
-        false -> ws
-      end
-    end)
+    new_words =
+      game.word_slots
+      |> Enum.map(fn ws ->
+        case ws.word == word do
+          true -> %{ws | used: true}
+          false -> ws
+        end
+      end)
+
     message = "\"" <> word <> "\" selected"
 
     %{game | word_slots: new_words}
@@ -42,7 +43,7 @@ defmodule Secretwords.GameState do
   def ensure_membership(game, user_id) do
     case Enum.find(game.teams, fn {_, members} -> Enum.member?(members, user_id) end) do
       {_, _} -> game
-         nil -> game |> join(Enum.random([:red, :blue]), user_id)
+      nil -> game |> join(Enum.random([:red, :blue]), user_id)
     end
   end
 
@@ -80,7 +81,7 @@ defmodule Secretwords.GameState do
         {color, determine_leader(game.leaders[color], members)}
       end)
       |> Enum.reject(fn {_, members} -> is_nil(members) end)
-      |> Map.new
+      |> Map.new()
 
     game
     |> set_leaders(new_leaders)
@@ -88,13 +89,18 @@ defmodule Secretwords.GameState do
 
   defp determine_leader(current_leader, members) do
     case length(members) do
-      0 -> nil
-      1 -> List.first(members)
-      _ -> if !is_nil(current_leader) do
-        current_leader
-      else
+      0 ->
+        nil
+
+      1 ->
         List.first(members)
-      end
+
+      _ ->
+        if !is_nil(current_leader) do
+          current_leader
+        else
+          List.first(members)
+        end
     end
   end
 
@@ -104,7 +110,7 @@ defmodule Secretwords.GameState do
       leaders
       |> Enum.filter(fn {color, user_id} -> game.leaders[color] != user_id end)
       |> Enum.map(fn {color, user_id} ->
-          user_id <> " leads the " <> Atom.to_string(color) <> " team"
+        user_id <> " leads the " <> Atom.to_string(color) <> " team"
       end)
       |> Enum.reject(&is_nil/1)
 

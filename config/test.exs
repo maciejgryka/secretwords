@@ -10,4 +10,4 @@ config :secretwords, SecretwordsWeb.Endpoint,
 config :logger, level: :warn
 
 config :wallaby,
-  driver: Wallaby.Chrome,
+  driver: Wallaby.Chrome

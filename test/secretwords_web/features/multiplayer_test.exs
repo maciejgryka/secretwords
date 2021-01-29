@@ -36,6 +36,7 @@ defmodule SecretwordsWeb.Features.MultiplayerTest do
       player2
       |> all(@member_list)
       |> Enum.map(fn ml -> ml |> all(@member) |> length end)
+
     if Enum.min(member_counts) == 0 do
       player2 |> click(Query.button("Switch teams"))
     end

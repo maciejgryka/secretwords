@@ -11,6 +11,7 @@ defmodule SecretwordsWeb.GameLive do
     end
 
     user_id = session["user_id"]
+
     game =
       Helpers.get_or_create_game(game_id)
       |> GameState.ensure_membership(user_id)
@@ -22,7 +23,7 @@ defmodule SecretwordsWeb.GameLive do
       |> assign(user_id: user_id)
       |> update_and_assign(game)
 
-      {:ok, socket}
+    {:ok, socket}
   end
 
   def handle_event("switch_teams", _value, socket) do
@@ -46,8 +47,8 @@ defmodule SecretwordsWeb.GameLive do
   def handle_event("next_round", _value, socket) do
     game =
       Helpers.get_or_create_game(socket.assigns.game.id)
-      |> GameState.next_round
-      |> Helpers.update_game
+      |> GameState.next_round()
+      |> Helpers.update_game()
 
     {:noreply, update_and_assign(socket, game)}
   end
@@ -65,13 +66,12 @@ defmodule SecretwordsWeb.GameLive do
   defp derived_state(game, user_id) do
     %{
       is_leader: user_id in Map.values(game.leaders),
-      enough_members: (
+      enough_members:
         game.teams
-        |> Map.values
+        |> Map.values()
         |> Enum.map(&length/1)
-        |> Enum.min
-      ) >= @min_players,
-      game_started: game.round > 0,
+        |> Enum.min() >= @min_players,
+      game_started: game.round > 0
     }
   end
 end
