@@ -11,6 +11,3 @@ config :logger, level: :warn
 
 config :wallaby,
   driver: Wallaby.Chrome,
-  chrome: [
-    headless: true
-  ]
