@@ -1,0 +1,41 @@
+name: Continuous Integration
+on: [push]
+
+jobs:
+  test:
+    env:
+      MIX_ENV: ci
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v1.0.0
+      - name: Recover dependency cache
+        uses: actions/cache@v1
+        id: deps_cache
+        with:
+          path: deps
+          key: ${{ runner.OS }}-deps-${{ hashFiles('**/mix.lock') }}
+          restore-keys: |
+            ${{ runner.OS }}-deps-${{ env.cache-name }}-
+            ${{ runner.OS }}-deps-
+            ${{ runner.OS }}-
+      - name: Recover build cache
+        uses: actions/cache@v1
+        with:
+          path: _build
+          key: ${{ runner.OS }}-build-${{ env.cache-name }}
+          restore-keys: |
+            ${{ runner.OS }}-build-
+            ${{ runner.OS }}-
+      - uses: actions/setup-elixir@v1.0.0
+        with:
+          otp-version: 23.2
+          elixir-version: 1.11
+      - uses: nanasess/setup-chromedriver@master
+      - name: Install Dependencies
+        run: mix deps.get
+      - run: mix compile
+      - run: npm install
+        working-directory: ./assets
+      - run: npm run deploy --prefix ./assets
+      - run: mix test --trace

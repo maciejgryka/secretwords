@@ -9,4 +9,8 @@ config :secretwords, SecretwordsWeb.Endpoint,
 # Print only warnings and errors during test
 config :logger, level: :warn
 
-config :wallaby, driver: Wallaby.Chrome
+config :wallaby,
+  driver: Wallaby.Chrome,
+  chrome: [
+    headless: true
+  ]
