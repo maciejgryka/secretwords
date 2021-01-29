@@ -44,6 +44,7 @@ defmodule Secretwords.MixProject do
       {:phoenix_live_view, "~> 0.15.3"},
       {:floki, ">= 0.27.0", only: :test},
       {:mix_test_watch, "~> 1.0", only: :dev, runtime: false},
+      {:wallaby, "~> 0.28.0", only: :test, runtime: false}
     ]
   end
 end
