@@ -1,4 +1,7 @@
 defmodule SecretwordsWeb.GameLive do
+  @moduledoc """
+  LiveView of the game.
+  """
   use SecretwordsWeb, :live_view
 
   alias Secretwords.{GameState, Helpers}

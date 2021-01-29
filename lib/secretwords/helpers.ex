@@ -1,4 +1,8 @@
 defmodule Secretwords.Helpers do
+  @moduledoc """
+  Helper functions, which I don't know where else to stick.
+  """
+
   alias Secretwords.{GameState, WordSlot}
 
   defp words(num) do

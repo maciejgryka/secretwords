@@ -1,4 +1,7 @@
 defmodule SecretwordsWeb.FeatureCase do
+  @moduledoc """
+  A wallaby-specific test case.
+  """
   use ExUnit.CaseTemplate
 
   using do

@@ -1,4 +1,8 @@
 defmodule Secretwords.GameState do
+  @moduledoc """
+  Implementation of the main game logic.
+  """
+
   @type t :: map
 
   defstruct id: "",
@@ -96,10 +100,10 @@ defmodule Secretwords.GameState do
         List.first(members)
 
       _ ->
-        if !is_nil(current_leader) do
-          current_leader
-        else
+        if is_nil(current_leader) do
           List.first(members)
+        else
+          current_leader
         end
     end
   end

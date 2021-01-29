@@ -1,4 +1,7 @@
 defmodule Secretwords.Plugs.SetUser do
+  @moduledoc """
+  Set a user ID in the session if it doesn't exist.
+  """
   import Plug.Conn
 
   alias Secretwords.Helpers

@@ -1,4 +1,10 @@
 defmodule Secretwords.Plugs.SetMembership do
+  @moduledoc """
+  If the user joined a game (i.e. the session contains game_id) retrieve the
+  membership info from the game state and set it in the session for
+  convenience.
+  """
+
   import Plug.Conn
 
   def init(_params) do
