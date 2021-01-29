@@ -1,5 +1,5 @@
 defmodule SecretwordsWeb.Features.MultiplayerTest do
-  use SecretwordsWeb.ConnCase, async: true
+  use SecretwordsWeb.ConnCase, async: false
   use Wallaby.Feature
 
   alias Wallaby.Query
@@ -9,7 +9,7 @@ defmodule SecretwordsWeb.Features.MultiplayerTest do
   @start_button Query.button("Start game")
 
   feature "single user cannot starte the game", %{session: session} do
-    game_path = Routes.live_path(@endpoint, SecretwordsWeb.GameLive, session.id)
+    game_path = Routes.live_path(@endpoint, SecretwordsWeb.GameLive, "aaa")
 
     session
     |> visit(game_path)
@@ -21,7 +21,7 @@ defmodule SecretwordsWeb.Features.MultiplayerTest do
 
   @sessions 2
   feature "two users can start the game", %{sessions: [player1, player2]} do
-    game_path = Routes.live_path(@endpoint, SecretwordsWeb.GameLive, player1.id)
+    game_path = Routes.live_path(@endpoint, SecretwordsWeb.GameLive, "aaa")
 
     player1
     |> visit(game_path)
