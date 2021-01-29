@@ -24,4 +24,7 @@ jobs:
       - name: Install Mix Dependencies
         if: steps.mix-cache.outputs.cache-hit != 'true'
         run: mix deps.get
+      - run: npm install
+        working-directory: ./assets
+      - run: npm run deploy --prefix ./assets
       - run: mix test --trace
