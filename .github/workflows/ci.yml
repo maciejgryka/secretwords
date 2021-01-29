@@ -6,9 +6,15 @@ jobs:
     env:
       MIX_ENV: ci
     runs-on: ubuntu-latest
+    name: OTP ${{matrix.otp}} / Elixir ${{matrix.elixir}}
+    strategy:
+      matrix:
+        otp: ['23.2']
+        elixir: ['1.11']
 
     steps:
-      - uses: actions/checkout@v1.0.0
+      - uses: actions/checkout@v2
+
       - name: Recover dependency cache
         uses: actions/cache@v1
         id: deps_cache
@@ -19,6 +25,7 @@ jobs:
             ${{ runner.OS }}-deps-${{ env.cache-name }}-
             ${{ runner.OS }}-deps-
             ${{ runner.OS }}-
+
       - name: Recover build cache
         uses: actions/cache@v1
         with:
@@ -27,15 +34,12 @@ jobs:
           restore-keys: |
             ${{ runner.OS }}-build-
             ${{ runner.OS }}-
-      - uses: actions/setup-elixir@v1.0.0
+
+      - uses: erlef/setup-elixir@v1
         with:
-          otp-version: 23.2
-          elixir-version: 1.11
+          otp-version: ${{matrix.otp}}
+          elixir-version: ${{matrix.elixir}}
+
       - uses: nanasess/setup-chromedriver@master
-      - name: Install Dependencies
-        run: mix deps.get
-      - run: mix compile
-      - run: npm install
-        working-directory: ./assets
-      - run: npm run deploy --prefix ./assets
+      - run: mix deps.get
       - run: mix test --trace
