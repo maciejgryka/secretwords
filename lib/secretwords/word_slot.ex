@@ -3,6 +3,11 @@ defmodule Secretwords.WordSlot do
 
   defstruct word: "",
             used: false,
-            # :red, :blue, :neutral, :killer,
             type: :neutral
+
+  @type t :: %__MODULE__{
+          word: String.t(),
+          used: boolean,
+          type: :red | :blue | :neutral | :killer
+        }
 end

@@ -45,7 +45,8 @@ defmodule Secretwords.MixProject do
       {:floki, ">= 0.27.0", only: :test},
       {:mix_test_watch, "~> 1.0", only: :dev, runtime: false},
       {:wallaby, "~> 0.28.0", only: :test, runtime: false},
-      {:credo, "~> 1.5", only: [:dev, :test], runtime: false}
+      {:credo, "~> 1.5", only: [:dev, :test], runtime: false},
+      {:dialyxir, "~> 1.0", only: [:dev, :test], runtime: false}
     ]
   end
 end
