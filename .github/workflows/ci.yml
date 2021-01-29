@@ -1,45 +1,19 @@
-name: Continuous Integration
-on: [push]
+on: push
 
 jobs:
   test:
-    env:
-      MIX_ENV: ci
     runs-on: ubuntu-latest
     name: OTP ${{matrix.otp}} / Elixir ${{matrix.elixir}}
     strategy:
       matrix:
         otp: ['23.2']
         elixir: ['1.11']
-
     steps:
       - uses: actions/checkout@v2
-
-      - name: Recover dependency cache
-        uses: actions/cache@v1
-        id: deps_cache
-        with:
-          path: deps
-          key: ${{ runner.OS }}-deps-${{ hashFiles('**/mix.lock') }}
-          restore-keys: |
-            ${{ runner.OS }}-deps-${{ env.cache-name }}-
-            ${{ runner.OS }}-deps-
-            ${{ runner.OS }}-
-
-      - name: Recover build cache
-        uses: actions/cache@v1
-        with:
-          path: _build
-          key: ${{ runner.OS }}-build-${{ env.cache-name }}
-          restore-keys: |
-            ${{ runner.OS }}-build-
-            ${{ runner.OS }}-
-
       - uses: erlef/setup-elixir@v1
         with:
           otp-version: ${{matrix.otp}}
           elixir-version: ${{matrix.elixir}}
-
       - uses: nanasess/setup-chromedriver@master
       - run: mix deps.get
       - run: mix test --trace
