@@ -42,6 +42,6 @@ defmodule SecretwordsWeb.Features.MultiplayerTest do
 
     player2
     |> click(@start_button)
-    # |> assert_has(Query.text("Round 1"))
+    |> assert_has(Query.text("Round 1"))
   end
 end
