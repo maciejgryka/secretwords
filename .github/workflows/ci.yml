@@ -23,6 +23,7 @@ jobs:
         with:
           path: deps
           key: ${{ runner.os }}-${{ matrix.otp }}-${{ matrix.elixir }}-mix-${{ hashFiles(format('{0}{1}', github.workspace, '/mix.lock')) }}
+      - run: mix format --check-formatted
       - uses: nanasess/setup-chromedriver@master
       - name: Install Mix Dependencies
         if: steps.mix-cache.outputs.cache-hit != 'true'
