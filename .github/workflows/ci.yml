@@ -14,6 +14,12 @@ jobs:
         with:
           otp-version: ${{matrix.otp}}
           elixir-version: ${{matrix.elixir}}
+      - name: Retrieve Mix Dependencies Cache
+        uses: actions/cache@v1
+        id: mix-cache # id to use in retrieve action
+        with:
+          path: deps
+          key: ${{ runner.os }}-${{ matrix.otp }}-${{ matrix.elixir }}-mix-${{ hashFiles(format('{0}{1}', github.workspace, '/mix.lock')) }}
       - uses: nanasess/setup-chromedriver@master
       - run: mix deps.get
       - run: mix test --trace
