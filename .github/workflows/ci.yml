@@ -34,10 +34,8 @@ jobs:
           mix local.hex --force
           mix deps.get
           mix deps.compile
-          mix dialyzer --plt
       - run: mix format --check-formatted
       - run: mix credo
-      - run: mix dialyzer --no-check
       - name: Get npm cache directory
         id: npm-cache-dir
         run: |
