@@ -1,5 +1,5 @@
 defmodule Secretwords.GameStateTest do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
 
   alias Secretwords.{GameState, WordSlot}
 
@@ -25,20 +25,6 @@ defmodule Secretwords.GameStateTest do
         |> GameState.join(:red, "member2")
 
       assert game.teams[:red] == ["member2", "member1"]
-    end
-  end
-
-  describe "membership" do
-    test "returns the team name for users in teams" do
-      game = %GameState{teams: %{red: ["u1", "u2"], blue: ["u3"]}}
-      assert GameState.membership(game, "u1") == :red
-      assert GameState.membership(game, "u2") == :red
-      assert GameState.membership(game, "u3") == :blue
-    end
-
-    test "returns nil for non-members" do
-      game = %GameState{teams: %{red: ["u1", "u2"], blue: ["u3"]}}
-      assert GameState.membership(game, "u4") == nil
     end
   end
 
@@ -69,6 +55,20 @@ defmodule Secretwords.GameStateTest do
                :red,
                "u4"
              ).teams == %{red: ["u1", "u2"], blue: ["u3"]}
+    end
+  end
+
+  describe "membership" do
+    test "returns the team name for users in teams" do
+      game = %GameState{teams: %{red: ["u1", "u2"], blue: ["u3"]}}
+      assert GameState.membership(game, "u1") == :red
+      assert GameState.membership(game, "u2") == :red
+      assert GameState.membership(game, "u3") == :blue
+    end
+
+    test "returns nil for non-members" do
+      game = %GameState{teams: %{red: ["u1", "u2"], blue: ["u3"]}}
+      assert GameState.membership(game, "u4") == nil
     end
   end
 
@@ -133,6 +133,28 @@ defmodule Secretwords.GameStateTest do
                teams: %{red: ["u1", "u2", "u3"], blue: ["u4"]},
                leaders: %{blue: "u4"}
              }).leaders == %{red: "u1", blue: "u4"}
+    end
+  end
+
+  describe "ensure_membership" do
+    test "adds the user to some team if the game has not yet started" do
+      assert "u1" in (%GameState{}
+                      |> GameState.ensure_membership("u1")
+                      |> GameState.all_players())
+    end
+
+    test "doesn't add the user to any team if the game has already started" do
+      assert "u1" not in (%GameState{round: 1}
+                          |> GameState.ensure_membership("u1")
+                          |> GameState.all_players())
+    end
+
+    test "doesn't add the user to any team if they're already a member" do
+      updated_teams =
+        (%GameState{teams: %{red: ["u1", "u3"], blue: ["u2"]}}
+         |> GameState.ensure_membership("u3")).teams
+
+      assert updated_teams == %{red: ["u1", "u3"], blue: ["u2"]}
     end
   end
 end

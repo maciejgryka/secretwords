@@ -68,7 +68,8 @@ defmodule SecretwordsWeb.GameLive do
 
   defp derived_state(game, user_id) do
     %{
-      is_leader: user_id in Map.values(game.leaders),
+      is_leader: game |> GameState.is_leader(user_id),
+      is_player: game |> GameState.is_player(user_id),
       enough_members:
         game.teams
         |> Map.values()

@@ -8,6 +8,7 @@ defmodule Secretwords.GameState do
             teams: %{red: [], blue: []},
             leaders: %{},
             round: 0,
+            guessing_now: :red,
             activity: []
 
   @type t :: %__MODULE__{
@@ -17,6 +18,7 @@ defmodule Secretwords.GameState do
           teams: %{},
           leaders: %{},
           round: integer,
+          guessing_now: atom,
           activity: [String.t()]
         }
 
@@ -56,11 +58,17 @@ defmodule Secretwords.GameState do
 
   @spec ensure_membership(__MODULE__.t(), String.t()) :: __MODULE__.t()
   def ensure_membership(game, user_id) do
-    case Enum.find(game.teams, fn {_, members} -> Enum.member?(members, user_id) end) do
-      {_, _} -> game
-      nil -> game |> join(Enum.random([:red, :blue]), user_id)
+    if game.round > 0 or game |> is_player(user_id) do
+      game
+    else
+      game |> join(Enum.random([:red, :blue]), user_id)
     end
   end
+
+  def is_leader(game, user_id), do: user_id in all_leaders(game)
+  def is_player(game, user_id), do: user_id in all_players(game)
+  def all_leaders(game), do: game.leaders |> Map.values()
+  def all_players(game), do: game.teams |> Map.values() |> List.flatten()
 
   @spec join(__MODULE__.t(), atom, String.t()) :: __MODULE__.t()
   def join(game, color, user_id) do
