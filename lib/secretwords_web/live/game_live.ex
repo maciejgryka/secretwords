@@ -38,6 +38,17 @@ defmodule SecretwordsWeb.GameLive do
     {:noreply, update_and_assign(socket, game)}
   end
 
+  def handle_event("leave", %{"team" => color}, socket) do
+    color = String.to_atom(color)
+
+    game =
+      Helpers.get_or_create_game(socket.assigns.game.id)
+      |> GameState.leave(color, socket.assigns.user_id)
+      |> Helpers.update_game()
+
+    {:noreply, update_and_assign(socket, game)}
+  end
+
   def handle_event("choose_word", %{"word" => word}, socket) do
     game =
       Helpers.get_or_create_game(socket.assigns.game.id)

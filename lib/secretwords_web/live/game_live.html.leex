@@ -1,7 +1,7 @@
 <h2>Game: <%= @game.id %></h2>
 <h3>
     Round <%= @game.round %>
-    <%= if !@d.game_started || @d.has_control do %>
+    <%= if @d.is_player && (!@d.game_started || @d.has_control) do %>
         <button id="next-round"
             <%= if @d.enough_members do %>
                 phx-click="next_round"
@@ -50,7 +50,7 @@
     <h3>
         <% team_name = team |> Atom.to_string  %>
         <%= team_name |> String.capitalize %>
-        <%= if team == @game.now_guessing do %>
+        <%= if @d.game_started && team == @game.now_guessing do %>
             (guessing)
         <% end %>
     </h3>
@@ -62,6 +62,7 @@
                 (you)
                 <%= if !@d.game_started do %>
                      <button phx-click="switch_teams">Switch teams</button>
+                     <button phx-click="leave" phx-value-team="<%= team_name %>">Leave</button>
                 <% end %>
             <% end %>
         </li>
