@@ -67,15 +67,22 @@ defmodule SecretwordsWeb.GameLive do
   end
 
   defp derived_state(game, user_id) do
+    is_leader = game |> GameState.is_leader(user_id)
+    is_player = game |> GameState.is_player(user_id)
+    now_guessing = GameState.membership(game, user_id) == game.now_guessing
+    game_started = game.round > 0
+
     %{
-      is_leader: game |> GameState.is_leader(user_id),
-      is_player: game |> GameState.is_player(user_id),
+      is_leader: is_leader,
+      is_player: is_player,
+      now_guessing: now_guessing,
+      game_started: game_started,
+      has_control: is_player && !is_leader && now_guessing && game_started,
       enough_members:
         game.teams
         |> Map.values()
         |> Enum.map(&length/1)
-        |> Enum.min() >= @min_players,
-      game_started: game.round > 0
+        |> Enum.min() >= @min_players
     }
   end
 end

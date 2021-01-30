@@ -8,7 +8,7 @@ defmodule Secretwords.GameState do
             teams: %{red: [], blue: []},
             leaders: %{},
             round: 0,
-            guessing_now: :red,
+            now_guessing: :red,
             activity: []
 
   @type t :: %__MODULE__{
@@ -18,16 +18,26 @@ defmodule Secretwords.GameState do
           teams: %{},
           leaders: %{},
           round: integer,
-          guessing_now: atom,
+          now_guessing: atom,
           activity: [String.t()]
         }
 
   @spec next_round(__MODULE__.t()) :: __MODULE__.t()
   def next_round(game) do
     new_round = game.round + 1
-    message = "starting round " <> to_string(new_round)
 
-    %__MODULE__{game | round: new_round}
+    now_guessing =
+      if game.now_guessing == :red do
+        :blue
+      else
+        :red
+      end
+
+    message =
+      "starting round " <>
+        to_string(new_round) <> ", " <> Atom.to_string(now_guessing) <> " guessing"
+
+    %__MODULE__{game | round: new_round, now_guessing: now_guessing}
     |> log_activity(message)
   end
 
