@@ -73,34 +73,32 @@ defmodule Secretwords.GameStateTest do
   end
 
   describe "choose_word" do
-    test "chooses a word" do
-      assert GameState.choose_word(
-               %GameState{
-                 word_slots: [
-                   %WordSlot{word: "one", used: false},
-                   %WordSlot{word: "two", used: false}
-                 ]
-               },
-               "two"
-             ).word_slots == [
-               %WordSlot{word: "one", used: false},
-               %WordSlot{word: "two", used: true}
+    test "markes the word slot as used" do
+      game = %GameState{
+        word_slots: [
+          %WordSlot{word: "one", used: false, type: :red},
+          %WordSlot{word: "two", used: false, type: :blue}
+        ]
+      }
+
+      assert GameState.choose_word(game, "two").word_slots == [
+               %WordSlot{word: "one", used: false, type: :red},
+               %WordSlot{word: "two", used: true, type: :blue}
              ]
     end
 
-    test "does nothing for a non-existent word" do
-      assert GameState.choose_word(
-               %GameState{
-                 word_slots: [
-                   %WordSlot{word: "one", used: false},
-                   %WordSlot{word: "two", used: false}
-                 ]
-               },
-               "three"
-             ).word_slots == [
-               %WordSlot{word: "one", used: false},
-               %WordSlot{word: "two", used: false}
-             ]
+    test "updates points" do
+      game = %GameState{
+        word_slots: [
+          %WordSlot{word: "one", used: false, type: :red},
+          %WordSlot{word: "two", used: false, type: :blue},
+          %WordSlot{word: "three", used: false, type: :neutral}
+        ]
+      }
+
+      assert GameState.choose_word(game, "one").points == %{red: 1, blue: 0}
+      assert GameState.choose_word(game, "two").points == %{red: 0, blue: 1}
+      assert GameState.choose_word(game, "three").points == %{red: 0, blue: 0}
     end
   end
 

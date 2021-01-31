@@ -6,6 +6,7 @@ defmodule Secretwords.GameState do
             word_slots: [],
             grid_size: 5,
             teams: %{red: [], blue: []},
+            points: %{red: 0, blue: 0},
             leaders: %{},
             round: 0,
             now_guessing: :red,
@@ -16,6 +17,7 @@ defmodule Secretwords.GameState do
           word_slots: [Secretwords.WordSlot.t()],
           grid_size: integer,
           teams: %{},
+          points: %{},
           leaders: %{},
           round: integer,
           now_guessing: atom,
@@ -53,9 +55,42 @@ defmodule Secretwords.GameState do
       end)
 
     message = "\"" <> word <> "\" selected"
+    chosen_slot = find_slot_type(game, word)
+
+    message =
+      case chosen_slot in [:red, :blue] do
+        false -> message
+        true -> message <> ", " <> Atom.to_string(chosen_slot) <> " gets a point"
+      end
 
     %{game | word_slots: new_words}
+    |> update_points(chosen_slot)
     |> log_activity(message)
+  end
+
+  defp update_points(game, chosen_slot_type) do
+    case chosen_slot_type do
+      :red ->
+        game |> add_point(:red)
+
+      :blue ->
+        game |> add_point(:blue)
+
+      :neutral ->
+        game
+
+      :killer ->
+        game
+    end
+  end
+
+  defp add_point(game, team) do
+    %__MODULE__{game | points: game.points |> Map.put(team, game.points[team] + 1)}
+  end
+
+  defp find_slot_type(game, word) do
+    chosen_slot = game.word_slots |> Enum.find(fn ws -> ws.word == word end)
+    chosen_slot |> Map.get(:type)
   end
 
   @spec membership(__MODULE__.t(), String.t()) :: atom | nil
