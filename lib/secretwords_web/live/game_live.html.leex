@@ -50,6 +50,7 @@
     <h3>
         <% team_name = team |> Atom.to_string  %>
         <%= team_name |> String.capitalize %>
+        (<%= @game.points[team] %>)
         <%= if @d.game_started && team == @game.now_guessing do %>
             (guessing)
         <% end %>

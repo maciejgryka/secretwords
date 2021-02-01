@@ -24,7 +24,7 @@ defmodule Secretwords.GameState do
           activity: [String.t()]
         }
 
-  @spec next_round(__MODULE__.t()) :: __MODULE__.t()
+  @spec next_round(t) :: t
   def next_round(game) do
     new_round = game.round + 1
 
@@ -35,15 +35,13 @@ defmodule Secretwords.GameState do
         :red
       end
 
-    message =
-      "starting round " <>
-        to_string(new_round) <> ", " <> Atom.to_string(now_guessing) <> " guessing"
-
-    %__MODULE__{game | round: new_round, now_guessing: now_guessing}
-    |> log_activity(message)
+    game
+    |> Map.put(:round, new_round)
+    |> Map.put(:now_guessing, now_guessing)
+    |> log_activity("starting round #{new_round}, #{now_guessing} guessing")
   end
 
-  @spec choose_word(__MODULE__.t(), String.t()) :: __MODULE__.t()
+  @spec choose_word(t, String.t()) :: t
   def choose_word(game, word) do
     new_words =
       game.word_slots
@@ -54,54 +52,49 @@ defmodule Secretwords.GameState do
         end
       end)
 
-    message = "\"" <> word <> "\" selected"
-    chosen_slot = find_slot_type(game, word)
-
-    message =
-      case chosen_slot in [:red, :blue] do
-        false -> message
-        true -> message <> ", " <> Atom.to_string(chosen_slot) <> " gets a point"
-      end
-
-    %{game | word_slots: new_words}
-    |> update_points(chosen_slot)
-    |> log_activity(message)
+    game
+    |> update_words(new_words)
+    |> log_activity("\"" <> word <> "\" selected")
   end
 
-  defp update_points(game, chosen_slot_type) do
+  @spec update_words(t(), [WordSlot.t()]) :: t()
+  def update_words(game, new_words), do: %{game | word_slots: new_words}
+
+  @spec find_slot(t, String.t()) :: WordSlot.t()
+  def find_slot(game, word), do: game.word_slots |> Enum.find(&(&1.word == word))
+
+  @spec update_points(t, :blue | :killer | :neutral | :red) :: t
+  def update_points(game, chosen_slot_type) do
     case chosen_slot_type do
       :red ->
-        game |> add_point(:red)
+        game |> add_point(:red) |> log_activity("red gets a point")
 
       :blue ->
-        game |> add_point(:blue)
+        game |> add_point(:blue) |> log_activity("blue gets a point")
 
       :neutral ->
         game
 
       :killer ->
+        # TODO: add endgame
         game
     end
   end
 
   defp add_point(game, team) do
-    %__MODULE__{game | points: game.points |> Map.put(team, game.points[team] + 1)}
+    updated_points = %{game.points | team => game.points[team] + 1}
+    %{game | points: updated_points}
   end
 
-  defp find_slot_type(game, word) do
-    chosen_slot = game.word_slots |> Enum.find(fn ws -> ws.word == word end)
-    chosen_slot |> Map.get(:type)
-  end
-
-  @spec membership(__MODULE__.t(), String.t()) :: atom | nil
+  @spec membership(t, String.t()) :: atom | nil
   def membership(game, user_id) do
-    case Enum.find(game.teams, fn {_color, members} -> Enum.member?(members, user_id) end) do
-      {color, _members} -> color
+    case Enum.find(game.teams, fn {_c, members} -> user_id in members end) do
+      {color, _m} -> color
       nil -> nil
     end
   end
 
-  @spec ensure_membership(__MODULE__.t(), String.t()) :: __MODULE__.t()
+  @spec ensure_membership(t, String.t()) :: t
   def ensure_membership(game, user_id) do
     if game.round > 0 or game |> is_player(user_id) do
       game
@@ -110,12 +103,19 @@ defmodule Secretwords.GameState do
     end
   end
 
+  @spec is_leader(t, String.t()) :: boolean
   def is_leader(game, user_id), do: user_id in all_leaders(game)
+
+  @spec is_player(t, String.t()) :: boolean
   def is_player(game, user_id), do: user_id in all_players(game)
+
+  @spec all_leaders(t) :: [String.t()]
   def all_leaders(game), do: game.leaders |> Map.values()
+
+  @spec all_players(t) :: [String.t()]
   def all_players(game), do: game.teams |> Map.values() |> List.flatten()
 
-  @spec join(__MODULE__.t(), atom, String.t()) :: __MODULE__.t()
+  @spec join(t, atom, String.t()) :: t
   def join(game, color, user_id) do
     current_members = Map.get(game.teams, color, [])
     updated_members = Enum.uniq([user_id | current_members])
@@ -127,7 +127,7 @@ defmodule Secretwords.GameState do
     |> update_members(color, updated_members)
   end
 
-  @spec leave(__MODULE__.t(), atom, String.t()) :: __MODULE__.t()
+  @spec leave(t, atom, String.t()) :: t
   def leave(game, color, user_id) do
     current_members = game.teams[color]
     updated_members = Enum.reject(current_members, &(&1 == user_id))
@@ -139,13 +139,13 @@ defmodule Secretwords.GameState do
     |> update_members(color, updated_members)
   end
 
-  @spec update_members(__MODULE__.t(), atom, [String.t()]) :: __MODULE__.t()
+  @spec update_members(t, atom, [String.t()]) :: t
   defp update_members(game, color, new_members) do
-    %__MODULE__{game | teams: Map.put(game.teams, color, new_members)}
-    |> ensure_leaders()
+    updated_teams = Map.put(game.teams, color, new_members)
+    game |> Map.put(:teams, updated_teams) |> ensure_leaders()
   end
 
-  @spec ensure_leaders(__MODULE__.t()) :: __MODULE__.t()
+  @spec ensure_leaders(t) :: t
   def ensure_leaders(game) do
     new_leaders =
       game.teams
@@ -155,8 +155,7 @@ defmodule Secretwords.GameState do
       |> Enum.reject(fn {_, members} -> is_nil(members) end)
       |> Map.new()
 
-    game
-    |> set_leaders(new_leaders)
+    game |> set_leaders(new_leaders)
   end
 
   @spec determine_leader(String.t(), [String.t()]) :: String.t()
@@ -177,7 +176,7 @@ defmodule Secretwords.GameState do
     end
   end
 
-  @spec set_leaders(__MODULE__.t(), %{}) :: __MODULE__.t()
+  @spec set_leaders(t, %{}) :: t
   defp set_leaders(game, leaders) do
     # message for each new leader
     messages =
@@ -188,27 +187,33 @@ defmodule Secretwords.GameState do
       end)
       |> Enum.reject(&is_nil/1)
 
-    %__MODULE__{game | leaders: leaders}
+    game
+    |> Map.put(:leaders, leaders)
     |> log_activity(messages)
   end
 
-  @spec switch_teams(__MODULE__.t(), String.t()) :: __MODULE__.t()
+  @spec switch_teams(t, String.t()) :: t
   def switch_teams(game, user_id) do
     current_team = membership(game, user_id)
-    new_team = if current_team == :red, do: :blue, else: :red
+
+    new_team =
+      case current_team do
+        :red -> :blue
+        :blue -> :red
+      end
 
     game
     |> leave(current_team, user_id)
     |> join(new_team, user_id)
   end
 
-  @spec log_activity(__MODULE__.t(), [String.t()]) :: __MODULE__.t()
+  @spec log_activity(t, [String.t()]) :: t
   defp log_activity(game, messages) when is_list(messages) do
-    %__MODULE__{game | activity: messages ++ game.activity}
+    %{game | activity: messages ++ game.activity}
   end
 
-  @spec log_activity(__MODULE__.t(), String.t()) :: __MODULE__.t()
+  @spec log_activity(t, String.t()) :: t
   defp log_activity(game, message) do
-    %__MODULE__{game | activity: [message | game.activity]}
+    %{game | activity: [message | game.activity]}
   end
 end

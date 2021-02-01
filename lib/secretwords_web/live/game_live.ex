@@ -50,10 +50,13 @@ defmodule SecretwordsWeb.GameLive do
   end
 
   def handle_event("choose_word", %{"word" => word}, socket) do
-    game =
-      Helpers.get_or_create_game(socket.assigns.game.id)
-      |> GameState.choose_word(word)
-      |> Helpers.update_game()
+    game = Helpers.get_or_create_game(socket.assigns.game.id)
+    chosen_slot = game |> GameState.find_slot(word)
+
+    game
+    |> GameState.choose_word(word)
+    |> GameState.update_points(chosen_slot.type)
+    |> Helpers.update_game()
 
     {:noreply, update_and_assign(socket, game)}
   end

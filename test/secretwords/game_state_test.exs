@@ -86,19 +86,22 @@ defmodule Secretwords.GameStateTest do
                %WordSlot{word: "two", used: true, type: :blue}
              ]
     end
+  end
 
-    test "updates points" do
+  describe "update points" do
+    test "adds points correctly" do
       game = %GameState{
         word_slots: [
           %WordSlot{word: "one", used: false, type: :red},
           %WordSlot{word: "two", used: false, type: :blue},
           %WordSlot{word: "three", used: false, type: :neutral}
-        ]
+        ],
+        points: %{red: 0, blue: 0}
       }
 
-      assert GameState.choose_word(game, "one").points == %{red: 1, blue: 0}
-      assert GameState.choose_word(game, "two").points == %{red: 0, blue: 1}
-      assert GameState.choose_word(game, "three").points == %{red: 0, blue: 0}
+      assert GameState.update_points(game, :red).points == %{red: 1, blue: 0}
+      assert GameState.update_points(game, :blue).points == %{red: 0, blue: 1}
+      assert GameState.update_points(game, :neutral).points == %{red: 0, blue: 0}
     end
   end
 
