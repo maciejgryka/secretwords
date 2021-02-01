@@ -74,17 +74,14 @@ defmodule Secretwords.GameState do
   @spec update_points(t, :blue | :killer | :neutral | :red) :: t
   def update_points(game, chosen_slot_type) do
     case chosen_slot_type do
-      :red ->
-        game |> add_point(:red) |> log_activity("red gets a point")
-
-      :blue ->
-        game |> add_point(:blue) |> log_activity("blue gets a point")
-
       :neutral ->
         game
 
       :killer ->
         game
+
+      color when color in [:red, :blue] ->
+        game |> add_point(color) |> log_activity("#{color} gets a point")
     end
   end
 
