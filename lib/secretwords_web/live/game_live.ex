@@ -56,6 +56,7 @@ defmodule SecretwordsWeb.GameLive do
     game
     |> GameState.choose_word(word)
     |> GameState.update_points(chosen_slot.type)
+    |> GameState.step_round(chosen_slot.type)
     |> Helpers.update_game()
 
     {:noreply, update_and_assign(socket, game)}

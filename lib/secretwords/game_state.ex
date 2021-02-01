@@ -29,16 +29,24 @@ defmodule Secretwords.GameState do
     new_round = game.round + 1
 
     now_guessing =
-      if game.now_guessing == :red do
-        :blue
-      else
-        :red
+      case game.now_guessing do
+        :red -> :blue
+        :blue -> :red
       end
 
     game
     |> Map.put(:round, new_round)
     |> Map.put(:now_guessing, now_guessing)
     |> log_activity("starting round #{new_round}, #{now_guessing} guessing")
+  end
+
+  def step_round(game, chosen_word_slot_type) do
+    # advance round if the guessing team got it wrong,
+    # otherwise keep the round
+    case game.now_guessing == chosen_word_slot_type do
+      false -> game |> next_round()
+      true -> game
+    end
   end
 
   @spec choose_word(t, String.t()) :: t
@@ -76,7 +84,6 @@ defmodule Secretwords.GameState do
         game
 
       :killer ->
-        # TODO: add endgame
         game
     end
   end

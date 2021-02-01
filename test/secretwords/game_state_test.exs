@@ -3,6 +3,32 @@ defmodule Secretwords.GameStateTest do
 
   alias Secretwords.{GameState, WordSlot}
 
+  describe "next_round" do
+    test "advances the round and cycles now_guessing" do
+      game = %GameState{now_guessing: :red, round: 1}
+
+      updated_game = GameState.next_round(game)
+      assert updated_game.round == 2
+      assert updated_game.now_guessing == :blue
+
+      updated_game = GameState.next_round(updated_game)
+      assert updated_game.round == 3
+      assert updated_game.now_guessing == :red
+    end
+  end
+
+  describe "step_round" do
+    test "advances the round if the guess was wrong" do
+      game = %GameState{now_guessing: :red, round: 1}
+      assert GameState.step_round(game, :blue).round == 2
+    end
+
+    test "does not advance the round if the guess was correct" do
+      game = %GameState{now_guessing: :red, round: 1}
+      assert GameState.step_round(game, :red).round == 1
+    end
+  end
+
   describe "join" do
     test "joins the right team" do
       game = %GameState{} |> GameState.join(:red, "member1")
