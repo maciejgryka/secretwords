@@ -97,7 +97,8 @@ defmodule SecretwordsWeb.GameLive do
         game.teams
         |> Map.values()
         |> Enum.map(&length/1)
-        |> Enum.min() >= @min_players
+        |> Enum.min() >= @min_players,
+      finished: GameState.finished(game)
     }
   end
 end

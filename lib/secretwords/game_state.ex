@@ -9,6 +9,7 @@ defmodule Secretwords.GameState do
             points: %{red: 0, blue: 0},
             leaders: %{},
             round: 0,
+            winner: nil,
             now_guessing: :red,
             activity: []
 
@@ -20,33 +21,51 @@ defmodule Secretwords.GameState do
           points: %{},
           leaders: %{},
           round: integer,
+          winner: atom,
           now_guessing: atom,
           activity: [String.t()]
         }
+
+  @max_points 5
 
   @spec next_round(t) :: t
   def next_round(game) do
     new_round = game.round + 1
 
-    now_guessing =
-      case game.now_guessing do
-        :red -> :blue
-        :blue -> :red
-      end
+    new_guessing = other_team(game.now_guessing)
 
     game
     |> Map.put(:round, new_round)
-    |> Map.put(:now_guessing, now_guessing)
-    |> log_activity("starting round #{new_round}, #{now_guessing} guessing")
+    |> Map.put(:now_guessing, new_guessing)
+    |> log_activity("starting round #{new_round}, #{new_guessing} guessing")
   end
 
   def step_round(game, chosen_word_slot_type) do
-    # advance round if the guessing team got it wrong,
-    # otherwise keep the round
-    case game.now_guessing == chosen_word_slot_type do
-      false -> game |> next_round()
-      true -> game
+    now_guessing = game.now_guessing
+
+    case chosen_word_slot_type do
+      ^now_guessing ->
+        # keep the current round if the guessing team was right
+        game
+
+      :killer ->
+        # finish the game if the killer was chosen
+        game |> lose(now_guessing)
+
+      _ ->
+        # otherwise, advance to the next round
+        game |> next_round()
     end
+  end
+
+  def win(game, team) do
+    game
+    |> Map.put(:winner, team)
+    |> log_activity("game over, #{team} won")
+  end
+
+  def lose(game, team) do
+    game |> win(other_team(team))
   end
 
   @spec choose_word(t, String.t()) :: t
@@ -78,16 +97,35 @@ defmodule Secretwords.GameState do
         game
 
       :killer ->
-        game
+        # finish the game if the killer was chosen
+        game |> lose(game.now_guessing)
 
       color when color in [:red, :blue] ->
-        game |> add_point(color) |> log_activity("#{color} gets a point")
+        game |> add_point(color)
     end
   end
 
   defp add_point(game, team) do
     updated_points = %{game.points | team => game.points[team] + 1}
+
     %{game | points: updated_points}
+    |> log_activity("#{team} gets a point")
+    |> check_end()
+  end
+
+  defp check_end(game) do
+    winning_team_points =
+      game.points
+      |> Enum.find(fn {_team, points} -> points == @max_points end)
+
+    case winning_team_points do
+      nil -> game
+      {winning_team, @max_points} -> game |> win(winning_team)
+    end
+  end
+
+  def finished(game) do
+    game.winner != nil
   end
 
   @spec membership(t, String.t()) :: atom | nil
@@ -200,15 +238,9 @@ defmodule Secretwords.GameState do
   def switch_teams(game, user_id) do
     current_team = membership(game, user_id)
 
-    new_team =
-      case current_team do
-        :red -> :blue
-        :blue -> :red
-      end
-
     game
     |> leave(current_team, user_id)
-    |> join(new_team, user_id)
+    |> join(other_team(current_team), user_id)
   end
 
   @spec log_activity(t, [String.t()]) :: t
@@ -219,5 +251,12 @@ defmodule Secretwords.GameState do
   @spec log_activity(t, String.t()) :: t
   defp log_activity(game, message) do
     %{game | activity: [message | game.activity]}
+  end
+
+  defp other_team(team) do
+    case team do
+      :red -> :blue
+      :blue -> :red
+    end
   end
 end

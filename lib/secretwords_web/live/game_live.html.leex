@@ -1,4 +1,7 @@
-<h2>Game: <%= @game.id %></h2>
+<h2>
+    Game: <%= @game.id %>
+    <%= if @d.finished do %>GAME OVER<% end %>
+</h2>
 <h3>
     Round <%= @game.round %>
     <%= if @d.is_player && (!@d.game_started || @d.has_control) do %>
