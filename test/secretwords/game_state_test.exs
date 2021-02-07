@@ -69,6 +69,17 @@ defmodule Secretwords.GameStateTest do
              ).teams == %{red: ["u1", "u2"], blue: []}
     end
 
+    test "removes the leader when they leave" do
+      assert GameState.leave(
+               %GameState{
+                 teams: %{red: ["u1", "u2", "u4"], blue: ["u3"]},
+                 leaders: %{red: "u1", blue: "u3"}
+               },
+               :red,
+               "u1"
+             ).leaders.red != "u1"
+    end
+
     test "does nothing if the given user is not a member" do
       assert GameState.leave(
                %GameState{teams: %{red: ["u1", "u2"], blue: ["u3"]}},

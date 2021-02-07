@@ -202,19 +202,16 @@ defmodule Secretwords.GameState do
 
   @spec determine_leader(String.t(), [String.t()]) :: String.t()
   defp determine_leader(current_leader, members) do
-    case length(members) do
-      0 ->
-        nil
-
-      1 ->
-        List.first(members)
-
-      _ ->
-        if is_nil(current_leader) do
+    case length(members) > 0 do
+      true ->
+        if is_nil(current_leader) or !(current_leader in members) do
           List.first(members)
         else
           current_leader
         end
+
+      false ->
+        nil
     end
   end
 
