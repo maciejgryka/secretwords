@@ -2,6 +2,9 @@ defmodule Secretwords.GameState do
   @moduledoc """
   Implementation of the main game logic.
   """
+
+  import Secretwords.Helpers, only: [username: 1]
+
   defstruct id: "",
             word_slots: [],
             grid_size: 5,
@@ -161,7 +164,7 @@ defmodule Secretwords.GameState do
   def join(game, color, user_id) do
     current_members = Map.get(game.teams, color, [])
     updated_members = Enum.uniq([user_id | current_members])
-    message = user_id <> " joined the " <> Atom.to_string(color) <> " team"
+    message = username(user_id) <> " joined the " <> Atom.to_string(color) <> " team"
 
     game
     # log joining first, because update_members logs leadership changes
@@ -173,7 +176,7 @@ defmodule Secretwords.GameState do
   def leave(game, color, user_id) do
     current_members = game.teams[color]
     updated_members = Enum.reject(current_members, &(&1 == user_id))
-    message = user_id <> " left the " <> Atom.to_string(color) <> " team"
+    message = username(user_id) <> " left the " <> Atom.to_string(color) <> " team"
 
     game
     # log leaving first, because update_members logs leadership changes
@@ -222,7 +225,7 @@ defmodule Secretwords.GameState do
       leaders
       |> Enum.filter(fn {color, user_id} -> game.leaders[color] != user_id end)
       |> Enum.map(fn {color, user_id} ->
-        user_id <> " leads the " <> Atom.to_string(color) <> " team"
+        username(user_id) <> " leads the " <> Atom.to_string(color) <> " team"
       end)
       |> Enum.reject(&is_nil/1)
 

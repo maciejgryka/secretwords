@@ -11,6 +11,7 @@ defmodule SecretwordsWeb.GameLive do
   def mount(%{"id" => game_id}, session, socket) do
     if connected?(socket) do
       Phoenix.PubSub.subscribe(Secretwords.PubSub, game_id)
+      Phoenix.PubSub.subscribe(Secretwords.PubSub, "users")
     end
 
     user_id = session["user_id"]

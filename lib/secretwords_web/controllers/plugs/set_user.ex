@@ -1,23 +1,25 @@
 defmodule Secretwords.Plugs.SetUser do
   @moduledoc """
-  Set a user ID in the session if it doesn't exist.
+  If the user is not set, create, store in ets and store user_id in the session.
   """
   import Plug.Conn
 
-  alias Secretwords.Helpers
+  alias Secretwords.{Helpers, User}
 
   def init(_params) do
   end
 
   def call(conn, _params) do
-    conn
-    |> maybe_put_session("user_id", Helpers.random_string())
-  end
-
-  defp maybe_put_session(conn, key, value) do
-    case get_session(conn, key) do
-      nil -> conn |> put_session(key, value)
-      _val -> conn
+    case get_session(conn, "user_id") do
+      nil ->
+        user_id = Helpers.random_string()
+        Helpers.update_user(%User{
+          id: user_id,
+          name: user_id,
+        })
+        conn |> put_session("user_id", user_id)
+      _ ->
+        conn
     end
   end
 end

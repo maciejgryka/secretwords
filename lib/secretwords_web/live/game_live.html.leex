@@ -62,7 +62,7 @@
     <ul class="member-list <%= team_name %>">
         <%= for member <- Enum.sort(members) do %>
         <li class="member">
-            <span <%= if @game.leaders[team] == member do %>class="team-leader"<% end %>><%= member %></span>
+            <span <%= if @game.leaders[team] == member do %>class="team-leader"<% end %>><%= Helpers.username(member) %></span>
             <%= if member == @user_id do %>
                 (you)
                 <%= if !(@d.is_game_started || @d.is_game_finished) do %>
