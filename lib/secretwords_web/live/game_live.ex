@@ -85,20 +85,21 @@ defmodule SecretwordsWeb.GameLive do
     is_leader = game |> GameState.is_leader(user_id)
     is_player = game |> GameState.is_player(user_id)
     now_guessing = GameState.membership(game, user_id) == game.now_guessing
-    game_started = game.round > 0
+    is_game_started = game.round > 0
+    is_game_finished = GameState.finished(game)
 
     %{
       is_leader: is_leader,
       is_player: is_player,
       now_guessing: now_guessing,
-      game_started: game_started,
-      has_control: is_player && !is_leader && now_guessing && game_started,
+      is_game_started: is_game_started && !is_game_finished,
+      is_game_finished: is_game_finished,
+      has_control: is_player && !is_leader && now_guessing && is_game_started,
       enough_members:
         game.teams
         |> Map.values()
         |> Enum.map(&length/1)
-        |> Enum.min() >= @min_players,
-      finished: GameState.finished(game)
+        |> Enum.min() >= @min_players
     }
   end
 end
