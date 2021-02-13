@@ -12,7 +12,6 @@
   <body>
     <header>
       <h1><%= live_patch "Secretwords", to: Routes.page_path(@conn, :index) %></h1>
-      <div class="username"><%= Secretwords.Helpers.username(@conn.private.plug_session["user_id"]) %></div>
     </header>
     <%= @inner_content %>
   </body>

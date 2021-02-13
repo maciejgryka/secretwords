@@ -4,7 +4,7 @@ defmodule SecretwordsWeb.GameLive do
   """
   use SecretwordsWeb, :live_view
 
-  alias Secretwords.{GameState, Helpers}
+  alias Secretwords.{GameState, Helpers, User}
 
   @min_players 1
 
@@ -21,10 +21,15 @@ defmodule SecretwordsWeb.GameLive do
       |> GameState.ensure_membership(user_id)
       |> Helpers.update_game()
 
+    user = User.get_user(user_id)
+    usernames = GameState.all_users(game)
+
     socket =
       socket
       |> assign(min_players: @min_players)
       |> assign(user_id: user_id)
+      |> assign(user: user)
+      |> assign(usernames: usernames)
       |> update_and_assign(game)
 
     {:ok, socket}
@@ -72,8 +77,25 @@ defmodule SecretwordsWeb.GameLive do
     {:noreply, update_and_assign(socket, game)}
   end
 
+  def handle_event("update_username", %{"username" => username}, socket) do
+    user =
+      %User{id: socket.assigns.user_id, name: username}
+      |> User.update_user()
+
+    socket =
+      socket
+      |> assign(:user, user)
+      |> assign(:usernames, GameState.all_users(socket.assigns.game))
+
+    {:noreply, socket}
+  end
+
   def handle_info({:game_updated, game_id}, socket) do
     {:noreply, update_and_assign(socket, Helpers.get_or_create_game(game_id))}
+  end
+
+  def handle_info({:user_updated, _user_id}, socket) do
+    {:noreply, assign(socket, :usernames, GameState.all_users(socket.assigns.game))}
   end
 
   defp update_and_assign(socket, game) do

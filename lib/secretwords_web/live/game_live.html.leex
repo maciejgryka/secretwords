@@ -1,3 +1,10 @@
+<div class="username">
+    <form phx-submit="update_username">
+        <label for="input-username">Name:</label>
+        <input type="text" id="input-username" name="username" value="<%= @user.name %>">
+        <button>Update</submit>
+    </form>
+</div>
 <h2>
     Game: <%= @game.id %>
     <%= if @d.is_game_finished do %>GAME OVER<% end %>
@@ -62,7 +69,7 @@
     <ul class="member-list <%= team_name %>">
         <%= for member <- Enum.sort(members) do %>
         <li class="member">
-            <span <%= if @game.leaders[team] == member do %>class="team-leader"<% end %>><%= Helpers.username(member) %></span>
+            <span <%= if @game.leaders[team] == member do %>class="team-leader"<% end %>><%= @usernames[member] %></span>
             <%= if member == @user_id do %>
                 (you)
                 <%= if !(@d.is_game_started || @d.is_game_finished) do %>

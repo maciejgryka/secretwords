@@ -4,7 +4,29 @@ defmodule Secretwords.User do
   defstruct id: "", name: ""
 
   @type t :: %__MODULE__{
-    id: String.t(),
-    name: String.t(),
-  }
+          id: String.t(),
+          name: String.t()
+        }
+
+  def update_user(%__MODULE__{} = user) do
+    true = :ets.insert(:users, {user.id, user})
+    :ok = Phoenix.PubSub.broadcast!(Secretwords.PubSub, "users", {:user_updated, user.id})
+    user
+  end
+
+  def get_user(user_id) do
+    case :ets.lookup(:users, user_id) do
+      [] -> nil
+      [{_user_id, user}] -> user
+    end
+  end
+
+  def username(user_id) do
+    case get_user(user_id) do
+      nil -> nil
+      user -> user.name
+    end
+
+    # user_id
+  end
 end

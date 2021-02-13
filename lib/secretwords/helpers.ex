@@ -3,7 +3,7 @@ defmodule Secretwords.Helpers do
   Helper functions, which I don't know where else to stick.
   """
 
-  alias Secretwords.{GameState, WordSlot, User}
+  alias Secretwords.{GameState, WordSlot}
 
   defp words(num) do
     words =
@@ -82,20 +82,5 @@ defmodule Secretwords.Helpers do
     true = :ets.insert(:game_sessions, {game.id, game})
     :ok = Phoenix.PubSub.broadcast!(Secretwords.PubSub, game.id, {:game_updated, game.id})
     game
-  end
-
-  def update_user(%User{} = user) do
-    true = :ets.insert(:users, {user.id, user})
-    :ok = Phoenix.PubSub.broadcast!(Secretwords.PubSub, "users", {:user_updated, user.id})
-    user
-  end
-
-  def get_user(user_id) do
-    [{user_id, user}] = :ets.lookup(:users, user_id)
-    user
-  end
-
-  def username(user_id) do
-    get_user(user_id).name
   end
 end

@@ -178,13 +178,13 @@ defmodule Secretwords.GameStateTest do
     test "adds the user to some team if the game has not yet started" do
       assert "u1" in (%GameState{}
                       |> GameState.ensure_membership("u1")
-                      |> GameState.all_players())
+                      |> GameState.all_user_ids())
     end
 
     test "doesn't add the user to any team if the game has already started" do
       assert "u1" not in (%GameState{round: 1}
                           |> GameState.ensure_membership("u1")
-                          |> GameState.all_players())
+                          |> GameState.all_user_ids())
     end
 
     test "doesn't add the user to any team if they're already a member" do

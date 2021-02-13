@@ -3,7 +3,7 @@ defmodule Secretwords.GameState do
   Implementation of the main game logic.
   """
 
-  import Secretwords.Helpers, only: [username: 1]
+  alias Secretwords.User
 
   defstruct id: "",
             word_slots: [],
@@ -84,7 +84,7 @@ defmodule Secretwords.GameState do
 
     game
     |> update_words(new_words)
-    |> log_activity("\"" <> word <> "\" selected")
+    |> log_activity("\"#{word}\" selected")
   end
 
   @spec update_words(t(), [WordSlot.t()]) :: t()
@@ -152,19 +152,26 @@ defmodule Secretwords.GameState do
   def is_leader(game, user_id), do: user_id in all_leaders(game)
 
   @spec is_player(t, String.t()) :: boolean
-  def is_player(game, user_id), do: user_id in all_players(game)
+  def is_player(game, user_id), do: user_id in all_user_ids(game)
 
   @spec all_leaders(t) :: [String.t()]
   def all_leaders(game), do: game.leaders |> Map.values()
 
-  @spec all_players(t) :: [String.t()]
-  def all_players(game), do: game.teams |> Map.values() |> List.flatten()
+  @spec all_user_ids(t) :: [String.t()]
+  def all_user_ids(game), do: game.teams |> Map.values() |> List.flatten()
+
+  def all_users(game) do
+    game
+    |> all_user_ids()
+    |> Enum.map(fn user_id -> {user_id, User.username(user_id)} end)
+    |> Map.new()
+  end
 
   @spec join(t, atom, String.t()) :: t
   def join(game, color, user_id) do
     current_members = Map.get(game.teams, color, [])
     updated_members = Enum.uniq([user_id | current_members])
-    message = username(user_id) <> " joined the " <> Atom.to_string(color) <> " team"
+    message = "#{user_id} joined the #{color} team"
 
     game
     # log joining first, because update_members logs leadership changes
@@ -176,7 +183,7 @@ defmodule Secretwords.GameState do
   def leave(game, color, user_id) do
     current_members = game.teams[color]
     updated_members = Enum.reject(current_members, &(&1 == user_id))
-    message = username(user_id) <> " left the " <> Atom.to_string(color) <> " team"
+    message = "#{user_id} left the #{color} team"
 
     game
     # log leaving first, because update_members logs leadership changes
@@ -219,13 +226,13 @@ defmodule Secretwords.GameState do
   end
 
   @spec set_leaders(t, %{}) :: t
-  defp set_leaders(game, leaders) do
+  def set_leaders(game, leaders) do
     # message for each new leader
     messages =
       leaders
       |> Enum.filter(fn {color, user_id} -> game.leaders[color] != user_id end)
       |> Enum.map(fn {color, user_id} ->
-        username(user_id) <> " leads the " <> Atom.to_string(color) <> " team"
+        "#{User.username(user_id)} leads the #{color} team"
       end)
       |> Enum.reject(&is_nil/1)
 

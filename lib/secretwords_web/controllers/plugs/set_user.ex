@@ -13,12 +13,29 @@ defmodule Secretwords.Plugs.SetUser do
     case get_session(conn, "user_id") do
       nil ->
         user_id = Helpers.random_string()
-        Helpers.update_user(%User{
+
+        User.update_user(%User{
           id: user_id,
-          name: user_id,
+          name: user_id
         })
+
         conn |> put_session("user_id", user_id)
-      _ ->
+
+      user_id ->
+        case User.get_user(user_id) do
+          nil ->
+            # the user_id in the session has no equivalent in ets, create a new user
+            User.update_user(%User{
+              id: user_id,
+              name: user_id
+            })
+
+            conn
+
+          %User{} ->
+            conn
+        end
+
         conn
     end
   end
