@@ -12,7 +12,7 @@
 <h3>
     Round <%= @game.round %>
     <% show_controls = @d.is_game_started && @d.has_control %>
-    <%= if !@d.is_game_finished do %>
+    <%= if !(@d.is_game_started || @d.is_game_finished) do %>
         <button id="next-round"
             <%= if @d.enough_members do %>
                 phx-click="next_round"
@@ -20,11 +20,12 @@
                 disabled
             <% end %>
         >
-            <%= if @game.round == 0 do %>
-                Start game
-            <% else %>
-                Next round
-            <% end %>
+            Start game
+        </button>
+    <% end %>
+    <%= if @d.is_game_started && @d.has_control do %>
+        <button id="next-round" phx-click="next_round">
+            Next round
         </button>
     <% end %>
 </h3>

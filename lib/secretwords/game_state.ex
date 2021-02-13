@@ -171,7 +171,7 @@ defmodule Secretwords.GameState do
   def join(game, color, user_id) do
     current_members = Map.get(game.teams, color, [])
     updated_members = Enum.uniq([user_id | current_members])
-    message = "#{user_id} joined the #{color} team"
+    message = "#{User.username(user_id)} joined the #{color} team"
 
     game
     # log joining first, because update_members logs leadership changes
@@ -183,7 +183,7 @@ defmodule Secretwords.GameState do
   def leave(game, color, user_id) do
     current_members = game.teams[color]
     updated_members = Enum.reject(current_members, &(&1 == user_id))
-    message = "#{user_id} left the #{color} team"
+    message = "#{User.username(user_id)} left the #{color} team"
 
     game
     # log leaving first, because update_members logs leadership changes
