@@ -3,57 +3,7 @@ defmodule Secretwords.Helpers do
   Helper functions, which I don't know where else to stick.
   """
 
-  alias Secretwords.{GameState, WordSlot}
-
-  defp words(num) do
-    words =
-      "data/words.txt"
-      |> File.read!()
-      |> String.split("\n", trim: true)
-      |> Enum.shuffle()
-      |> Enum.slice(num)
-
-    types = word_slot_types()
-
-    make_word_slots(words, types)
-  end
-
-  def make_word_slots(words, types) do
-    [words, types]
-    |> Enum.zip()
-    |> Enum.map(fn {word, type} -> %WordSlot{word: word, type: type} end)
-  end
-
-  def word_slot_types() do
-    [
-      :neutral,
-      :neutral,
-      :neutral,
-      :neutral,
-      :neutral,
-      :neutral,
-      :neutral,
-      :neutral,
-      :neutral,
-      :neutral,
-      :neutral,
-      :neutral,
-      :neutral,
-      :neutral,
-      :red,
-      :red,
-      :red,
-      :red,
-      :red,
-      :blue,
-      :blue,
-      :blue,
-      :blue,
-      :blue,
-      :killer
-    ]
-    |> Enum.shuffle()
-  end
+  alias Secretwords.GameState
 
   def get_or_create_game(game_id) do
     grid_size = 5
@@ -65,7 +15,7 @@ defmodule Secretwords.Helpers do
       [] ->
         %GameState{
           id: game_id,
-          word_slots: words(1..(grid_size * grid_size)),
+          word_slots: GameState.words(1..(grid_size * grid_size)),
           grid_size: grid_size
         }
     end

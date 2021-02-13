@@ -8,6 +8,7 @@
 <h2>
     Game: <%= @game.id %>
     <%= if @d.is_game_finished do %>GAME OVER<% end %>
+    <button phx-click="reset_game">Reset</button>
 </h2>
 <h3>
     Round <%= @game.round %>

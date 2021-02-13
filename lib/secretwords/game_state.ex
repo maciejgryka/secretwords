@@ -3,7 +3,7 @@ defmodule Secretwords.GameState do
   Implementation of the main game logic.
   """
 
-  alias Secretwords.User
+  alias Secretwords.{User, WordSlot}
 
   defstruct id: "",
             word_slots: [],
@@ -30,6 +30,69 @@ defmodule Secretwords.GameState do
         }
 
   @max_points 5
+
+  def words(num) do
+    words =
+      "data/words.txt"
+      |> File.read!()
+      |> String.split("\n", trim: true)
+      |> Enum.shuffle()
+      |> Enum.slice(num)
+
+    types = word_slot_types()
+
+    make_word_slots(words, types)
+  end
+
+  def make_word_slots(words, types) do
+    [words, types]
+    |> Enum.zip()
+    |> Enum.map(fn {word, type} -> %WordSlot{word: word, type: type} end)
+  end
+
+  def word_slot_types() do
+    [
+      :neutral,
+      :neutral,
+      :neutral,
+      :neutral,
+      :neutral,
+      :neutral,
+      :neutral,
+      :neutral,
+      :neutral,
+      :neutral,
+      :neutral,
+      :neutral,
+      :neutral,
+      :neutral,
+      :red,
+      :red,
+      :red,
+      :red,
+      :red,
+      :blue,
+      :blue,
+      :blue,
+      :blue,
+      :blue,
+      :killer
+    ]
+    |> Enum.shuffle()
+  end
+
+  def reset(game) do
+    num_words = game.grid_size * game.grid_size
+
+    %__MODULE__{
+      game
+      | word_slots: words(1..num_words),
+        points: %{red: 0, blue: 0},
+        round: 0,
+        winner: nil,
+        activity: []
+    }
+  end
 
   @spec next_round(t) :: t
   def next_round(game) do

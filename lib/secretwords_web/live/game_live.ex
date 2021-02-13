@@ -90,6 +90,15 @@ defmodule SecretwordsWeb.GameLive do
     {:noreply, socket}
   end
 
+  def handle_event("reset_game", _value, socket) do
+    game =
+      Helpers.get_or_create_game(socket.assigns.game.id)
+      |> GameState.reset()
+      |> Helpers.update_game()
+
+    {:noreply, update_and_assign(socket, game)}
+  end
+
   def handle_info({:game_updated, game_id}, socket) do
     {:noreply, update_and_assign(socket, Helpers.get_or_create_game(game_id))}
   end
