@@ -2,13 +2,13 @@
     <form phx-submit="update_username">
         <label for="input-username">Name:</label>
         <input type="text" id="input-username" name="username" value="<%= @user.name %>">
-        <button>Update</submit>
+        <button class="btn">Update</submit>
     </form>
 </div>
 <h2>
     Game: <%= @game.id %>
     <%= if @d.is_game_finished do %>GAME OVER<% end %>
-    <button phx-click="reset_game">Reset</button>
+    <button class="btn" phx-click="reset_game">Reset</button>
 </h2>
 <h3>
     Round <%= @game.round %>

@@ -1,3 +1,1 @@
-<h2>Main page</h2>
-
-<%= live_patch "New Game", to: Routes.live_path(@conn, SecretwordsWeb.GameLive, @game_id) %>
+<%= live_patch "Start a new game", to: Routes.live_path(@conn, SecretwordsWeb.GameLive, @game_id), type: "button", class: "btn" %>
