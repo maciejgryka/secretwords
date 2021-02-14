@@ -33,7 +33,7 @@ defmodule Secretwords.GameState do
 
   def words(num) do
     words =
-      "data/words.txt"
+      "assets/words.txt"
       |> File.read!()
       |> String.split("\n", trim: true)
       |> Enum.shuffle()
