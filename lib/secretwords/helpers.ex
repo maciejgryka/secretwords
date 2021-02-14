@@ -3,7 +3,7 @@ defmodule Secretwords.Helpers do
   Helper functions, which I don't know where else to stick.
   """
 
-  alias Secretwords.GameState
+  alias Secretwords.{GameState, Words}
 
   def get_or_create_game(game_id) do
     grid_size = 5
@@ -15,7 +15,7 @@ defmodule Secretwords.Helpers do
       [] ->
         %GameState{
           id: game_id,
-          word_slots: GameState.words(1..(grid_size * grid_size)),
+          word_slots: Words.words(1..(grid_size * grid_size)),
           grid_size: grid_size
         }
     end
