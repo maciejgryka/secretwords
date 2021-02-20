@@ -9,8 +9,8 @@
     <link phx-track-static rel="stylesheet" href="<%= Routes.static_path(@conn, "/css/app.css") %>"/>
     <script defer phx-track-static type="text/javascript" src="<%= Routes.static_path(@conn, "/js/app.js") %>"></script>
   </head>
-  <body class="m-2 text-gray-900">
-    <header class="mt-5 mb-5">
+  <body class="antialiased text-gray-900">
+    <header class="mt-4 max-w-sm mx-auto text-center">
       <h1 class="text-5xl font-bold "><%= live_patch "Secretwords", to: Routes.page_path(@conn, :index) %></h1>
     </header>
     <%= @inner_content %>

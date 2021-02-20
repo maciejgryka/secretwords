@@ -2,11 +2,11 @@
     <form phx-submit="update_username">
         <label for="input-username">Name:</label>
         <input type="text" id="input-username" name="username" value="<%= @user.name %>">
-        <button class="btn">Update</submit>
+        <button class="btn">Update</button>
     </form>
 </div>
 <h2>
-    Game: <%= @game.id %>
+    Link: http://words.gryka.net/g/<%= @game.id %>
     <%= if @d.is_game_finished do %>GAME OVER<% end %>
     <button class="btn" phx-click="reset_game">Reset</button>
 </h2>
@@ -75,8 +75,8 @@
             <%= if member == @user_id do %>
                 (you)
                 <%= if !(@d.is_game_started || @d.is_game_finished) do %>
-                     <button phx-click="switch_teams">Switch teams</button>
-                     <button phx-click="leave" phx-value-team="<%= team_name %>">Leave</button>
+                     <button class="btn" phx-click="switch_teams">Switch teams</button>
+                     <button class="btn" phx-click="leave" phx-value-team="<%= team_name %>">Leave</button>
                 <% end %>
             <% end %>
         </li>
