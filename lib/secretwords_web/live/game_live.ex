@@ -4,7 +4,7 @@ defmodule SecretwordsWeb.GameLive do
   """
   use SecretwordsWeb, :live_view
 
-  alias Secretwords.{GameState, Helpers, User}
+  alias Secretwords.{GameState, User}
 
   @min_players 1
 
@@ -17,9 +17,9 @@ defmodule SecretwordsWeb.GameLive do
     user_id = session["user_id"]
 
     game =
-      Helpers.get_or_create_game(game_id)
+      GameState.get_or_create_game(game_id)
       |> GameState.ensure_membership(user_id)
-      |> Helpers.update_game()
+      |> GameState.update_game()
 
     user = User.get_user(user_id)
     usernames = GameState.all_users(game)
@@ -37,9 +37,9 @@ defmodule SecretwordsWeb.GameLive do
 
   def handle_event("switch_teams", _value, socket) do
     game =
-      Helpers.get_or_create_game(socket.assigns.game.id)
+      GameState.get_or_create_game(socket.assigns.game.id)
       |> GameState.switch_teams(socket.assigns.user_id)
-      |> Helpers.update_game()
+      |> GameState.update_game()
 
     {:noreply, update_and_assign(socket, game)}
   end
@@ -48,31 +48,31 @@ defmodule SecretwordsWeb.GameLive do
     color = String.to_atom(color)
 
     game =
-      Helpers.get_or_create_game(socket.assigns.game.id)
+      GameState.get_or_create_game(socket.assigns.game.id)
       |> GameState.leave(color, socket.assigns.user_id)
-      |> Helpers.update_game()
+      |> GameState.update_game()
 
     {:noreply, update_and_assign(socket, game)}
   end
 
   def handle_event("choose_word", %{"word" => word}, socket) do
-    game = Helpers.get_or_create_game(socket.assigns.game.id)
+    game = GameState.get_or_create_game(socket.assigns.game.id)
     chosen_slot = game |> GameState.find_slot(word)
 
     game
     |> GameState.choose_word(word)
     |> GameState.update_points(chosen_slot.type)
     |> GameState.step_round(chosen_slot.type)
-    |> Helpers.update_game()
+    |> GameState.update_game()
 
     {:noreply, update_and_assign(socket, game)}
   end
 
   def handle_event("next_round", _value, socket) do
     game =
-      Helpers.get_or_create_game(socket.assigns.game.id)
+      GameState.get_or_create_game(socket.assigns.game.id)
       |> GameState.next_round()
-      |> Helpers.update_game()
+      |> GameState.update_game()
 
     {:noreply, update_and_assign(socket, game)}
   end
@@ -92,15 +92,15 @@ defmodule SecretwordsWeb.GameLive do
 
   def handle_event("reset_game", _value, socket) do
     game =
-      Helpers.get_or_create_game(socket.assigns.game.id)
+      GameState.get_or_create_game(socket.assigns.game.id)
       |> GameState.reset()
-      |> Helpers.update_game()
+      |> GameState.update_game()
 
     {:noreply, update_and_assign(socket, game)}
   end
 
   def handle_info({:game_updated, game_id}, socket) do
-    {:noreply, update_and_assign(socket, Helpers.get_or_create_game(game_id))}
+    {:noreply, update_and_assign(socket, GameState.get_or_create_game(game_id))}
   end
 
   def handle_info({:user_updated, _user_id}, socket) do

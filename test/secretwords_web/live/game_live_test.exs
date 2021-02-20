@@ -3,7 +3,7 @@ defmodule SecretwordsWeb.GameLiveTest do
 
   import Phoenix.LiveViewTest
 
-  alias Secretwords.{GameState, WordSlot, Helpers}
+  alias Secretwords.{GameState, WordSlot}
   alias SecretwordsWeb.GameLive
 
   test "renders the game", %{conn: conn} do
@@ -105,7 +105,7 @@ defmodule SecretwordsWeb.GameLiveTest do
     game_id = unique_identifier(conn)
 
     game =
-      Helpers.update_game(%GameState{
+      GameState.update_game(%GameState{
         id: game_id,
         now_guessing: :red,
         round: 1,
