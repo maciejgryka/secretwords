@@ -103,8 +103,9 @@ defmodule SecretwordsWeb.GameLive do
     {:noreply, update_and_assign(socket, GameState.get_or_create_game(game_id))}
   end
 
-  def handle_info({:user_updated, _user_id}, socket) do
-    {:noreply, assign(socket, :usernames, GameState.all_users(socket.assigns.game))}
+  def handle_info({:user_updated, user_id, user_name}, socket) do
+    updated_users = %{socket.assigns.usernames | user_id => user_name}
+    {:noreply, assign(socket, :usernames, updated_users)}
   end
 
   defp update_and_assign(socket, game) do

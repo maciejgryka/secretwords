@@ -176,7 +176,7 @@ defmodule Secretwords.GameState do
   def all_users(game) do
     game
     |> all_user_ids()
-    |> Enum.map(fn user_id -> {user_id, User.username(user_id)} end)
+    |> Enum.map(fn user_id -> {user_id, User.name(user_id)} end)
     |> Map.new()
   end
 
@@ -184,7 +184,7 @@ defmodule Secretwords.GameState do
   def join(game, color, user_id) do
     current_members = Map.get(game.teams, color, [])
     updated_members = Enum.uniq([user_id | current_members])
-    message = "#{User.username(user_id)} joined the #{color} team"
+    message = "#{User.name(user_id)} joined the #{color} team"
 
     game
     # log joining first, because update_members logs leadership changes
@@ -196,7 +196,7 @@ defmodule Secretwords.GameState do
   def leave(game, color, user_id) do
     current_members = game.teams[color]
     updated_members = Enum.reject(current_members, &(&1 == user_id))
-    message = "#{User.username(user_id)} left the #{color} team"
+    message = "#{User.name(user_id)} left the #{color} team"
 
     game
     # log leaving first, because update_members logs leadership changes
@@ -245,7 +245,7 @@ defmodule Secretwords.GameState do
       leaders
       |> Enum.filter(fn {color, user_id} -> game.leaders[color] != user_id end)
       |> Enum.map(fn {color, user_id} ->
-        "#{User.username(user_id)} leads the #{color} team"
+        "#{User.name(user_id)} leads the #{color} team"
       end)
       |> Enum.reject(&is_nil/1)
 

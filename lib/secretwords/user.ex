@@ -10,7 +10,10 @@ defmodule Secretwords.User do
 
   def update_user(%__MODULE__{} = user) do
     true = :ets.insert(:users, {user.id, user})
-    :ok = Phoenix.PubSub.broadcast!(Secretwords.PubSub, "users", {:user_updated, user.id})
+
+    :ok =
+      Phoenix.PubSub.broadcast!(Secretwords.PubSub, "users", {:user_updated, user.id, user.name})
+
     user
   end
 
@@ -21,7 +24,7 @@ defmodule Secretwords.User do
     end
   end
 
-  def username(user_id) do
+  def name(user_id) do
     case get_user(user_id) do
       nil -> nil
       user -> user.name

@@ -7,9 +7,9 @@ defmodule SecretwordsWeb.Router do
     plug :fetch_live_flash
     plug :protect_from_forgery
     plug :put_secure_browser_headers
-    plug :put_root_layout, {SecretwordsWeb.LayoutView, :root}
     plug Secretwords.Plugs.SetUser
     plug Secretwords.Plugs.SetMembership
+    plug :put_root_layout, {SecretwordsWeb.LayoutView, :root}
   end
 
   pipeline :api do
