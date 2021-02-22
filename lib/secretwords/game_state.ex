@@ -196,12 +196,17 @@ defmodule Secretwords.GameState do
   def leave(game, color, user_id) do
     current_members = game.teams[color]
     updated_members = Enum.reject(current_members, &(&1 == user_id))
-    message = "#{User.name(user_id)} left the #{color} team"
 
-    game
-    # log leaving first, because update_members logs leadership changes
-    |> log_activity(message)
-    |> update_members(color, updated_members)
+    if updated_members != current_members do
+      message = "#{User.name(user_id)} left the #{color} team"
+
+      game
+      # log leaving first, because update_members logs leadership changes
+      |> log_activity(message)
+      |> update_members(color, updated_members)
+    else
+      game
+    end
   end
 
   @spec update_members(t, atom, [String.t()]) :: t
