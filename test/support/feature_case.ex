@@ -7,6 +7,7 @@ defmodule SecretwordsWeb.FeatureCase do
   using do
     quote do
       use Wallaby.DSL
+      # credo:disable-for-next-line
       alias SecretwordsWeb.Router.Helpers, as: Routes
 
       @endpoint SecretwordsWeb.Endpoint

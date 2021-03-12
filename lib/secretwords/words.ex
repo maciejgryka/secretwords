@@ -18,7 +18,7 @@ defmodule Secretwords.Words do
     |> Enum.map(fn {word, type} -> %WordSlot{word: word, type: type} end)
   end
 
-  def word_slot_types() do
+  def word_slot_types do
     [
       :neutral,
       :neutral,
@@ -49,7 +49,7 @@ defmodule Secretwords.Words do
     |> Enum.shuffle()
   end
 
-  def all_words() do
+  def all_words do
     # http://www.desiquintans.com/nounlist
     ~w(
       ATM

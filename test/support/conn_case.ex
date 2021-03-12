@@ -24,6 +24,7 @@ defmodule SecretwordsWeb.ConnCase do
       import Phoenix.ConnTest
       import SecretwordsWeb.ConnCase
 
+      # credo:disable-for-next-line
       alias SecretwordsWeb.Router.Helpers, as: Routes
 
       # The default endpoint for testing
