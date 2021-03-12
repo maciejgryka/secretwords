@@ -12,16 +12,16 @@ defmodule SecretwordsWeb.GameLiveTest do
 
     {:ok, _view, html} = live(conn, "/g/" <> game_id)
 
-    assert html =~ "Game: #{game_id}"
-    assert html =~ "<table id=\"word-grid\">"
+    assert html =~ "/g/#{game_id}"
+    assert html =~ "<table id=\"word-grid\""
   end
 
-  test "renders the round and start game button", %{conn: conn} do
+  test "renders the round and switch teams button", %{conn: conn} do
     game_id = unique_identifier(conn)
     {:ok, view, _html} = live(conn, Routes.live_path(conn, GameLive, game_id))
 
     assert render(view) =~ "Round 0"
-    assert render(view) =~ "Start game"
+    assert render(view) =~ "Switch teams"
   end
 
   describe "selecting a word" do

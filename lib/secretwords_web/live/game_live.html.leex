@@ -1,22 +1,46 @@
-<div class="username">
-    <form phx-submit="update_username">
-        <label for="input-username">Name:</label>
-        <input type="text" id="input-username" name="username" value="<%= @user.name %>">
-        <button class="btn">Update</button>
-    </form>
+<div id="game-controls" class="mt-6 mx-3">
+    <span id="sharing-link" class="p-2 border border-gray-200 rounded-md shadow-xs bg-gray-200 text-sm">
+        http://words.gryka.net/g/<%= @game.id %>
+        <%# <span class="ml-2 pl-2 inline-block border-l border-gray-500 h-full cursor-pointer">C</span> %>
+    </span>
+    <button class="btn float-right" phx-click="leave">Leave</button>
+    <button class="btn float-right mr-2" phx-click="reset_game">Reset Game</button>
 </div>
-<h2>
-    Link: http://words.gryka.net/g/<%= @game.id %>
-    <%= if @d.is_game_finished do %>GAME OVER<% end %>
-    <button class="btn" phx-click="reset_game">Reset Game</button>
-    <button class="btn" phx-click="leave">Leave</button>
-</h2>
-<h3 class="text-2xl text-center font-bold">
-    Round <%= @game.round %>
+
+<h3 id="round-counter" class="mt-6 text-2xl text-center font-bold">
+    <%= if @d.is_game_finished do %>
+        GAME OVER
+    <% else %>
+        Round <%= @game.round %>
+    <% end %>
 </h3>
+
 <% show_controls = @d.is_game_started && @d.has_control %>
 
-<table id="word-grid" class="w-full text-sm sm:text-base md:max-w-3xl">
+<div class="mx-3 mt-4 tex">
+<%= if @d.enough_members do %>
+        <%= if !(@d.is_game_started || @d.is_game_finished) do %>
+            <button id="next-round" class="btn mx-auto"
+                <%= if @d.enough_members do %>
+                    phx-click="next_round"
+                <% else %>
+                    disabled
+                <% end %>
+            >
+                Start game
+            </button>
+        <% end %>
+        <%= if @d.is_game_started && @d.has_control do %>
+            <button id="next-round" phx-click="next_round">
+                Next round
+            </button>
+        <% end %>
+<% else %>
+    <p class="py-1">Need at least <%= @min_players %> players on each team to start the game.</p>
+<% end %>
+</div>
+
+<table id="word-grid" class="mt-6 w-full text-sm sm:text-base">
     <%= for row <- Enum.chunk_every(@game.word_slots, @game.grid_size) do %>
     <tr>
         <%= for ws <- row do %>
@@ -43,34 +67,24 @@
     <% end %>
 </table>
 
-<div class="mt-2">
-    <%= if @d.enough_members do %>
-        <%= if !(@d.is_game_started || @d.is_game_finished) do %>
-            <button id="next-round" class="btn"
-                <%= if @d.enough_members do %>
-                    phx-click="next_round"
-                <% else %>
-                    disabled
-                <% end %>
+<%= if !@d.is_game_started do %>
+    <div class="username mx-3 mt-6">
+        <form phx-submit="update_username">
+            <label for="input-username">Name:</label>
+            <input
+                class="p-2 border border-gray-200 rounded-md shadow-xs focus:border-blue-300 outline-none"
+                type="text" id="input-username" name="username" value="<%= @user.name %>"
             >
-                Start game
-            </button>
-        <% end %>
-        <%= if @d.is_game_started && @d.has_control do %>
-            <button id="next-round" phx-click="next_round">
-                Next round
-            </button>
-        <% end %>
-    <% else %>
-        <p>Need at least <%= @min_players %> players on each team to start the game.</p>
-    <% end %>
-</div>
+            <button class="btn">Update</button>
+        </form>
+    </div>
+<% end %>
 
-<div id="teams" class="grid grid-cols-2">
+<div id="teams" class="mx-3 mt-6 grid grid-cols-2">
     <%= for {team, members} <- @game.teams do %>
         <div class="team">
             <% team_name = team |> Atom.to_string  %>
-            <h3 class="mt-2 text-xl font-semibold text-<%= if team_name == "blue" do %>blue-400<% else %>yellow-500<% end %>">
+            <h3 class="text-xl font-semibold text-center text-<%= if team_name == "blue" do %>blue-400<% else %>yellow-500<% end %>">
                 <%= team_name |> String.capitalize %>
                 (<%= @game.points[team] %>)
                 <%= if @d.is_game_started && team == @game.now_guessing do %>

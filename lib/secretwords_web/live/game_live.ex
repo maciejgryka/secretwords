@@ -6,7 +6,7 @@ defmodule SecretwordsWeb.GameLive do
 
   alias Secretwords.{GameState, User}
 
-  @min_players 1
+  @min_players 2
 
   def mount(%{"id" => game_id}, session, socket) do
     if connected?(socket) do
@@ -109,7 +109,12 @@ defmodule SecretwordsWeb.GameLive do
 
   def handle_info({:user_updated, user_id, user_name}, socket) do
     updated_users = socket.assigns.usernames |> Map.put(user_id, user_name)
-    {:noreply, assign(socket, :usernames, updated_users)}
+
+    socket =
+      socket
+      |> assign(:usernames, updated_users)
+
+    {:noreply, socket}
   end
 
   defp update_and_assign(socket, game) do
