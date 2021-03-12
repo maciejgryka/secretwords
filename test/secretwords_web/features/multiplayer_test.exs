@@ -6,7 +6,9 @@ defmodule SecretwordsWeb.Features.MultiplayerTest do
   alias Secretwords.GameState
 
   @start_button Query.button("Start game")
+  @switch_teams Query.button("Switch teams")
   @not_started Query.text("Round 0")
+  @started Query.text("Round 1")
   @not_enough_players Query.css("p",
                         text: "Need at least 2 players on each team to start the game."
                       )
@@ -26,32 +28,51 @@ defmodule SecretwordsWeb.Features.MultiplayerTest do
     |> visit(game_path)
     |> assert_has(@not_started)
     |> assert_has(@not_enough_players)
+    |> assert_has(@switch_teams)
 
     player2
     |> visit(game_path)
     |> assert_has(@not_started)
     |> assert_has(@not_enough_players)
+    |> assert_has(@switch_teams)
 
     player3
     |> visit(game_path)
     |> assert_has(@not_started)
     |> assert_has(@not_enough_players)
+    |> assert_has(@switch_teams)
 
     player4
     |> visit(game_path)
     |> assert_has(@not_started)
+    |> assert_has(@switch_teams)
+
+    # assign members and leaders
+    # it doesn't matter which team each of the players is on as long as each team has 2 players
+    [
+      red = [red_leader | _],
+      blue = [blue_leader | _]
+    ] =
+      game_id
+      |> GameState.get_or_create_game()
+      |> GameState.all_user_ids()
+      |> Enum.chunk_every(2)
 
     # set up team membership predictably
     game_id
     |> GameState.get_or_create_game()
-    |> Map.put(:teams, %{red: [player1.id, player2.id], blue: [player3.id, player4.id]})
-    |> Map.put(:leaders, %{red: player1.id, blue: player3.id})
+    |> Map.put(:teams, %{red: red, blue: blue})
+    |> Map.put(:leaders, %{red: red_leader, blue: blue_leader})
     |> GameState.update_game()
 
-    player1
-    |> refute_has(@not_enough_players)
+    player2
     |> assert_has(@not_started)
+    |> refute_has(@not_enough_players)
+    |> click(@switch_teams)
+    |> assert_has(@not_enough_players)
+    |> click(@switch_teams)
+    |> refute_has(@not_enough_players)
     |> click(@start_button)
-    |> refute_has(@not_started)
+    |> assert_has(@started)
   end
 end
