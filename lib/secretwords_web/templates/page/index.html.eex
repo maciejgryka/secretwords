@@ -1,3 +1,12 @@
-<h2>Main page</h2>
-
-<%= live_patch "New Game", to: Routes.live_path(@conn, SecretwordsWeb.GameLive, @game_id) %>
+<div class="mt-6 flex w-10/12 max-w-4xl mx-auto">
+    <%=
+        live_patch "New Game",
+        to: Routes.live_path(@conn, SecretwordsWeb.GameLive, @game_id),
+        type: "button",
+        class: "px-2 py-16 mx-0 bg-blue-200 hover:bg-blue-300 rounded-lg text-xl text-center w-6/12 inline-block shadow-md"
+    %>
+    <div class="w-1/12"></div>
+    <button class="px-2 py-16 mx-0 bg-red-200 hover:bg-red-300 rounded-lg text-xl text-center w-6/12 inline-block shadow-md">
+        Join
+    </button>
+</div>

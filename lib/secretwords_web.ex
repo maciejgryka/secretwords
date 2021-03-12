@@ -23,6 +23,7 @@ defmodule SecretwordsWeb do
 
       import Plug.Conn
       import SecretwordsWeb.Gettext
+      # credo:disable-for-next-line
       alias SecretwordsWeb.Router.Helpers, as: Routes
       import Phoenix.LiveView.Controller
     end
@@ -90,6 +91,7 @@ defmodule SecretwordsWeb do
 
       import SecretwordsWeb.ErrorHelpers
       import SecretwordsWeb.Gettext
+      # credo:disable-for-next-line
       alias SecretwordsWeb.Router.Helpers, as: Routes
     end
   end

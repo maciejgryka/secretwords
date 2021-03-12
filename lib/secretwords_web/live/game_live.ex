@@ -6,7 +6,7 @@ defmodule SecretwordsWeb.GameLive do
 
   alias Secretwords.{GameState, User}
 
-  @min_players 1
+  @min_players 2
 
   def mount(%{"id" => game_id}, session, socket) do
     if connected?(socket) do
@@ -44,15 +44,19 @@ defmodule SecretwordsWeb.GameLive do
     {:noreply, update_and_assign(socket, game)}
   end
 
-  def handle_event("leave", %{"team" => color}, socket) do
-    color = String.to_atom(color)
-
+  def handle_event("leave", _params, socket) do
     game =
       GameState.get_or_create_game(socket.assigns.game.id)
-      |> GameState.leave(color, socket.assigns.user_id)
+      |> GameState.leave(:red, socket.assigns.user_id)
+      |> GameState.leave(:blue, socket.assigns.user_id)
       |> GameState.update_game()
 
-    {:noreply, update_and_assign(socket, game)}
+    socket =
+      socket
+      |> update_and_assign(game)
+      |> redirect(to: "/")
+
+    {:noreply, socket}
   end
 
   def handle_event("choose_word", %{"word" => word}, socket) do
@@ -104,8 +108,13 @@ defmodule SecretwordsWeb.GameLive do
   end
 
   def handle_info({:user_updated, user_id, user_name}, socket) do
-    updated_users = %{socket.assigns.usernames | user_id => user_name}
-    {:noreply, assign(socket, :usernames, updated_users)}
+    updated_users = socket.assigns.usernames |> Map.put(user_id, user_name)
+
+    socket =
+      socket
+      |> assign(:usernames, updated_users)
+
+    {:noreply, socket}
   end
 
   defp update_and_assign(socket, game) do

@@ -1,3 +1,18 @@
+@tailwind base;
+@tailwind components;
+
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center px-3 py-1 border border-transparent text-base rounded-md text-white bg-blue-600 hover:bg-blue-700;
+  }
+
+  .btn-primary {
+    @apply font-semibold tracking-wide uppercase;
+  }
+}
+
+@tailwind utilities;
+
 /* Alerts and form errors */
 .alert {
   padding: 15px;
