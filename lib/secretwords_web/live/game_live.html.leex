@@ -67,7 +67,7 @@
     <% end %>
 </table>
 
-<%= if !@d.is_game_started do %>
+<%= if !@d.is_game_started && @user != nil do %>
     <div class="username mx-3 mt-6">
         <form phx-submit="update_username">
             <label for="input-username">Name:</label>
