@@ -16,11 +16,10 @@ defmodule SecretwordsWeb.GameLiveTest do
     assert html =~ "<table id=\"word-grid\""
   end
 
-  test "renders the round and switch teams button", %{conn: conn} do
+  test "renders the switch teams button", %{conn: conn} do
     game_id = unique_identifier(conn)
     {:ok, view, _html} = live(conn, Routes.live_path(conn, GameLive, game_id))
 
-    assert render(view) =~ "Round 0"
     assert render(view) =~ "Switch teams"
   end
 
@@ -31,7 +30,7 @@ defmodule SecretwordsWeb.GameLiveTest do
       {:ok, view, _html} = live(conn, Routes.live_path(conn, GameLive, game_id))
 
       refute view
-             |> element("td.word.used", "one")
+             |> element("td.word.word-used", "one")
              |> has_element?()
 
       view
@@ -39,7 +38,7 @@ defmodule SecretwordsWeb.GameLiveTest do
       |> render_click()
 
       assert view
-             |> element("td.word.used", "one")
+             |> element("td.word.word-used", "one")
              |> has_element?()
     end
 
@@ -48,14 +47,14 @@ defmodule SecretwordsWeb.GameLiveTest do
       game_id = conn.assigns.game.id
       {:ok, view, _html} = live(conn, Routes.live_path(conn, GameLive, game_id))
 
-      assert view |> element("h3", ~r/\s*Red\s+\(0\)/) |> has_element?
-      assert view |> element("h3", ~r/\s*Blue\s+\(0\)/) |> has_element?
+      assert view |> element("#points-red", "0") |> has_element?
+      assert view |> element("#points-blue", "0") |> has_element?
 
       view |> element("td.word", "one") |> render_click()
-      assert view |> element("h3", ~r/\s*Red\s+\(1\)/) |> has_element?
+      assert view |> element("#points-red", "1") |> has_element?
 
       view |> element("td.word", "two") |> render_click()
-      assert view |> element("h3", ~r/\s*Blue\s+\(1\)/) |> has_element?
+      assert view |> element("#points-blue", "1") |> has_element?
     end
 
     test "does not advance the round on a corect guess", %{conn: conn} do
@@ -64,14 +63,10 @@ defmodule SecretwordsWeb.GameLiveTest do
       {:ok, view, _html} = live(conn, Routes.live_path(conn, GameLive, game_id))
 
       assert view |> element("h3", ~r/Round 1/) |> has_element?
-      assert view |> element("h3", ~r/Red[\n\s\(\)\d]*\(guessing\)/) |> has_element?
-      refute view |> element("h3", ~r/Blue[\n\s\(\)\d]*\(guessing\)/) |> has_element?
 
       view |> element("td.word", "one") |> render_click()
 
       assert view |> element("h3", ~r/Round 1/) |> has_element?
-      assert view |> element("h3", ~r/Red[\n\s\(\)\d]*\(guessing\)/) |> has_element?
-      refute view |> element("h3", ~r/Blue[\n\s\(\)\d]*\(guessing\)/) |> has_element?
     end
 
     test "advances the round on a wrong guess", %{conn: conn} do
@@ -80,14 +75,10 @@ defmodule SecretwordsWeb.GameLiveTest do
       {:ok, view, _html} = live(conn, Routes.live_path(conn, GameLive, game_id))
 
       assert view |> element("h3", ~r/Round 1/) |> has_element?
-      assert view |> element("h3", ~r/Red[\n\s\(\)\d]*\(guessing\)/) |> has_element?
-      refute view |> element("h3", ~r/Blue[\n\s\(\)\d]*\(guessing\)/) |> has_element?
 
       view |> element("td.word", "two") |> render_click()
 
       assert view |> element("h3", ~r/Round 2/) |> has_element?
-      refute view |> element("h3", ~r/Red[\n\s\(\)\d]*\(guessing\)/) |> has_element?
-      assert view |> element("h3", ~r/Blue[\n\s\(\)\d]*\(guessing\)/) |> has_element?
     end
   end
 

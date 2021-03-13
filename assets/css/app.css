@@ -9,6 +9,30 @@
   .btn-primary {
     @apply font-semibold tracking-wide uppercase;
   }
+
+  .word {
+    @apply bg-yellow-100 text-center w-2 h-2;
+  }
+
+  .team-leader {
+    @apply text-indigo-700 font-bold;
+  }
+
+  .word-selectable {
+    @apply cursor-pointer;
+  }
+
+  .word-red {
+    @apply bg-red-200;
+  }
+
+  .word-blue {
+    @apply bg-blue-200;
+  }
+
+  .word-killer {
+    @apply bg-gray-900 text-white;
+  }
 }
 
 @tailwind utilities;
@@ -47,36 +71,7 @@
   margin: -1rem 0 2rem;
 }
 
-.team-leader {
-  color: purple;
-  font-weight: bold;
-}
-
-.word {
-  background-color: #fcf8e3;
-  text-align: center;
-  width: 120px;
-  height: 60px;
-}
-
-.word.selectable {
-  cursor: pointer;
-}
-
-.word.used {
+.word-used {
   opacity: 0.3;
   cursor: default;
-}
-
-.word.red {
-  background-color: #a94442;
-}
-
-.word.blue {
-  background-color: #bce8f1
-}
-
-.word.killer {
-  background-color: black;
-  color: white;
 }

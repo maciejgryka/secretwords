@@ -7,7 +7,7 @@ defmodule SecretwordsWeb.Features.MultiplayerTest do
 
   @start_button Query.button("Start game")
   @switch_teams Query.button("Switch teams")
-  @not_started Query.text("Round 0")
+  @round Query.text("Round")
   @started Query.text("Round 1")
   @not_enough_players Query.css("p",
                         text: "Need at least 2 players on each team to start the game."
@@ -26,25 +26,25 @@ defmodule SecretwordsWeb.Features.MultiplayerTest do
 
     player1
     |> visit(game_path)
-    |> assert_has(@not_started)
+    |> refute_has(@round)
     |> assert_has(@not_enough_players)
     |> assert_has(@switch_teams)
 
     player2
     |> visit(game_path)
-    |> assert_has(@not_started)
+    |> refute_has(@round)
     |> assert_has(@not_enough_players)
     |> assert_has(@switch_teams)
 
     player3
     |> visit(game_path)
-    |> assert_has(@not_started)
+    |> refute_has(@round)
     |> assert_has(@not_enough_players)
     |> assert_has(@switch_teams)
 
     player4
     |> visit(game_path)
-    |> assert_has(@not_started)
+    |> refute_has(@round)
     |> assert_has(@switch_teams)
 
     # assign members and leaders
@@ -66,7 +66,7 @@ defmodule SecretwordsWeb.Features.MultiplayerTest do
     |> GameState.update_game()
 
     player2
-    |> assert_has(@not_started)
+    |> refute_has(@round)
     |> refute_has(@not_enough_players)
     |> click(@switch_teams)
     |> assert_has(@not_enough_players)

@@ -11,16 +11,18 @@
     <%= if @d.is_game_finished do %>
         GAME OVER
     <% else %>
-        Round <%= @game.round %>
+        <%= if @d.is_game_started do %>
+            Round <%= @game.round %>
+        <% end %>
     <% end %>
 </h3>
 
 <% show_controls = @d.is_game_started && @d.has_control %>
 
-<div class="mx-3 mt-4 tex">
-<%= if @d.enough_members do %>
+<div class="mx-3 mt-4 w-full text-center">
+    <%= if @d.enough_members do %>
         <%= if !(@d.is_game_started || @d.is_game_finished) do %>
-            <button id="next-round" class="btn mx-auto"
+            <button id="next-round" class="btn"
                 <%= if @d.enough_members do %>
                     phx-click="next_round"
                 <% else %>
@@ -30,14 +32,9 @@
                 Start game
             </button>
         <% end %>
-        <%= if @d.is_game_started && @d.has_control do %>
-            <button id="next-round" phx-click="next_round">
-                Next round
-            </button>
-        <% end %>
-<% else %>
-    <p class="py-1">Need at least <%= @min_players %> players on each team to start the game.</p>
-<% end %>
+    <% else %>
+        <p class="py-1">Need at least <%= @min_players %> players on each team to start the game.</p>
+    <% end %>
 </div>
 
 <table id="word-grid" class="mt-6 w-full text-sm sm:text-base">
@@ -51,9 +48,9 @@
                 tracking-tight
                 md:tracking-normal
                 word
-                <%= if ws.used do %> used<% end %>
-                <%= if @d.is_game_started && (@d.is_leader or ws.used) do %> <%= ws.type %><% end %>
-                <%= if is_word_active do %> selectable<% end %>
+                <%= if ws.used do %>word-used<% end %>
+                <%= if @d.is_game_started && (@d.is_leader or ws.used) do %>word-<%= ws.type %><% end %>
+                <%= if is_word_active do %>word-selectable<% end %>
             "
             <%= if is_word_active do %>
                 phx-click="choose_word"
@@ -66,6 +63,43 @@
     </tr>
     <% end %>
 </table>
+
+
+<div id="teams" class="grid grid-cols-2">
+    <%= for {team, members} <- @game.teams do %>
+        <div class="p-2<%= if @d.is_game_started && team == @game.now_guessing do %> bg-<%= team %>-100<% end %>">
+            <% team_name = team |> Atom.to_string  %>
+            <h3 class="text-xl font-semibold text-center text-<%= team_name %>-600">
+                <%= @usernames[@game.leaders[team]] %>
+                <%= if !(@d.is_game_started || @d.is_game_finished) && @user != nil && @game.leaders[team] == @user.id do %>
+                    <button class="btn" phx-click="switch_teams">Switch teams</button>
+                <% end %>
+                <br>
+                <span id="points-<%= team %>"><%= @game.points[team] %></span>
+            </h3>
+            <ul class="member-list <%= team_name %> mt-2">
+                <%= for member <- Enum.sort(members) do %>
+                    <%= if member != @game.leaders[team] do %>
+                        <li class="member">
+                            <%= @usernames[member] %>
+                            <%= if member == @user_id do %>
+                                (you)
+                                <%= if !(@d.is_game_started || @d.is_game_finished) do %>
+                                    <button class="btn" phx-click="switch_teams">Switch teams</button>
+                                <% end %>
+                            <% end %>
+                        </li>
+                    <% end %>
+                <% end %>
+            </ul>
+            <%= if @d.is_game_started && @d.has_control && Enum.member?(@game.teams[team], @user.id) do %>
+                <button class="btn mt-6 w-full" id="next-round" phx-click="next_round">
+                    Finish round
+                </button>
+            <% end %>
+        </div>
+    <% end %>
+</div>
 
 <%= if !@d.is_game_started && @user != nil do %>
     <div class="username mx-3 mt-6">
@@ -80,31 +114,4 @@
     </div>
 <% end %>
 
-<div id="teams" class="mx-3 mt-6 grid grid-cols-2">
-    <%= for {team, members} <- @game.teams do %>
-        <div class="team">
-            <% team_name = team |> Atom.to_string  %>
-            <h3 class="text-xl font-semibold text-center text-<%= if team_name == "blue" do %>blue-400<% else %>yellow-500<% end %>">
-                <%= team_name |> String.capitalize %>
-                (<%= @game.points[team] %>)
-                <%= if @d.is_game_started && team == @game.now_guessing do %>
-                    (guessing)
-                <% end %>
-            </h3>
-            <ul class="member-list <%= team_name %>">
-                <%= for member <- Enum.sort(members) do %>
-                <li class="member">
-                    <span <%= if @game.leaders[team] == member do %>class="team-leader"<% end %>><%= @usernames[member] %></span>
-                    <%= if member == @user_id do %>
-                        (you)
-                        <%= if !(@d.is_game_started || @d.is_game_finished) do %>
-                            <button class="btn" phx-click="switch_teams">Switch teams</button>
-                        <% end %>
-                    <% end %>
-                </li>
-                <% end %>
-            </ul>
-        </div>
-    <% end %>
-</div>
 <%= live_component @socket, SecretwordsWeb.ActivityLogComponent, activity: @game.activity %>
