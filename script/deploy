@@ -9,3 +9,5 @@ mix phx.digest &&
 MIX_ENV=prod mix release --overwrite &&
 rsync -r _build/prod/rel/secretwords worde:~/srv/
 
+echo "Files copied. Now SSH to the erver and do"
+echo "~/srv/secretwords/bin/secretwords restart"

@@ -45,9 +45,11 @@
         <td
             class="
                 py-7
-                tracking-tight
-                md:tracking-normal
+                tracking-wide
                 word
+                uppercase
+                text-xs
+                font-semibold
                 <%= if ws.used do %>
                     word-used
                 <% end %>
@@ -74,6 +76,7 @@
     <%= for {team, members} <- @game.teams do %>
         <div class="
             p-2
+            mt-4
             <%= if @d.is_game_started && team == @game.now_guessing do %>
                 guessing-<%= team %>
             <% end %>
