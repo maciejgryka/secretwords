@@ -33,6 +33,22 @@
   .word-killer {
     @apply bg-gray-900 text-white;
   }
+
+  .leader-name-red {
+    @apply text-red-600;
+  }
+
+  .leader-name-blue {
+    @apply text-blue-600;
+  }
+
+  .guessing-red {
+    @apply bg-red-100;
+  }
+
+  .guessing-blue {
+    @apply bg-blue-100;
+  }
 }
 
 @tailwind utilities;

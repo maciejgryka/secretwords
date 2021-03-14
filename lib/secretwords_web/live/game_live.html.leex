@@ -48,9 +48,15 @@
                 tracking-tight
                 md:tracking-normal
                 word
-                <%= if ws.used do %>word-used<% end %>
-                <%= if @d.is_game_started && (@d.is_leader or ws.used) do %>word-<%= ws.type %><% end %>
-                <%= if is_word_active do %>word-selectable<% end %>
+                <%= if ws.used do %>
+                    word-used
+                <% end %>
+                <%= if @d.is_game_started && (@d.is_leader or ws.used) do %>
+                    word-<%= ws.type %>
+                <% end %>
+                <%= if is_word_active do %>
+                    word-selectable
+                <% end %>
             "
             <%= if is_word_active do %>
                 phx-click="choose_word"
@@ -67,9 +73,19 @@
 
 <div id="teams" class="grid grid-cols-2">
     <%= for {team, members} <- @game.teams do %>
-        <div class="p-2<%= if @d.is_game_started && team == @game.now_guessing do %> bg-<%= team %>-100<% end %>">
+        <div class="
+            p-2
+            <%= if @d.is_game_started && team == @game.now_guessing do %>
+                guessing-<%= team %>
+            <% end %>
+        ">
             <% team_name = team |> Atom.to_string  %>
-            <h3 class="text-xl font-semibold text-center text-<%= team_name %>-600">
+            <h3 class="
+                text-xl
+                font-semibold
+                text-center
+                leader-name-<%= team %>
+            ">
                 <%= @usernames[@game.leaders[team]] %>
                 <%= if !(@d.is_game_started || @d.is_game_finished) && @user != nil && @game.leaders[team] == @user.id do %>
                     <button class="btn" phx-click="switch_teams">Switch teams</button>

@@ -1,15 +1,22 @@
-# Local prod run
+# Create a new release
 
 ```bash
 mix deps.get --only prod &&
 MIX_ENV=prod mix compile &&
-MIX_ENV=prod mix release --overwrite &&
 npm run deploy --prefix ./assets &&
-mix phx.digest
-
+mix phx.digest &&
+MIX_ENV=prod mix release --overwrite
+# copy the release over to the server
+rsync -r _build/prod/rel/secretwords worde:~/srv/
 ```
 
 # copy the release over
 
 - `rsync -r _build/prod/rel/secretwords worde:~/srv/`
 - on the server `~/srv/secretwords/bin/secretwords restart`
+
+# Notes
+
+## The asset pipeline
+- The raw assets are owned by node and need to be compiled to `priv/static`.
+- From there, they're digested by `mix phx.digest` and copied over to the release with `mix release`?
