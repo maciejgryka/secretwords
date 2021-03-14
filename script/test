@@ -2,4 +2,6 @@
 
 set -eu pipefail
 
+mix format --check-formatted
+mix credo
 mix test
