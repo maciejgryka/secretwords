@@ -1,4 +1,23 @@
-<main role="main" class="mx-auto lg:max-w-4xl">
+<header class="mt-4 mx-3 grid grid-cols-6">
+  <div class="hidden sm:inline col-span-0 sm:col-span-1"></div>
+  <h1 class="col-span-5 sm:col-span-4 text-5xl font-bold sm:text-center">Secretwords</h1>
+  <span class="col-span-1 text-right">
+    <%= if !@d.is_game_started && @user != nil do %>
+      <div class="username mt-2">
+          <input
+              id="input-username"
+              class="p-1 max-w-full outline-none border cursor-pointer rounded-md focus:border-blue-300 text-center"
+              type="text"
+              name="username"
+              value="<%= @user.name %>"
+              phx-keydown="update_username"
+              phx-debounce="200"
+          >
+      </div>
+  <% end %>
+  </span>
+</header>
+<main role="main" class="">
   <p class="alert alert-info" role="alert"
     phx-click="lv:clear-flash"
     phx-value-key="info"><%= live_flash(@flash, :info) %></p>

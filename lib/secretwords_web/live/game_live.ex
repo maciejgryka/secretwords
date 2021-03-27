@@ -81,7 +81,7 @@ defmodule SecretwordsWeb.GameLive do
     {:noreply, update_and_assign(socket, game)}
   end
 
-  def handle_event("update_username", %{"username" => username}, socket) do
+  def handle_event("update_username", %{"value" => username}, socket) do
     user =
       %User{id: socket.assigns.user_id, name: username}
       |> User.update_user()

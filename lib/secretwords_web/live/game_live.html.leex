@@ -119,17 +119,4 @@
     <% end %>
 </div>
 
-<%= if !@d.is_game_started && @user != nil do %>
-    <div class="username mx-3 mt-6">
-        <form phx-submit="update_username">
-            <label for="input-username">Name:</label>
-            <input
-                class="p-2 border border-gray-200 rounded-md shadow-xs focus:border-blue-300 outline-none"
-                type="text" id="input-username" name="username" value="<%= @user.name %>"
-            >
-            <button class="btn">Update</button>
-        </form>
-    </div>
-<% end %>
-
 <%= live_component @socket, SecretwordsWeb.ActivityLogComponent, activity: @game.activity %>
