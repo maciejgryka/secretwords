@@ -29,7 +29,7 @@ defmodule Secretwords.GameState do
           activity: [String.t()]
         }
 
-  @max_points 5
+  @max_points 9
 
   def reset(game) do
     num_words = game.grid_size * game.grid_size
