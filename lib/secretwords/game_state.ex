@@ -66,11 +66,11 @@ defmodule Secretwords.GameState do
 
       :killer ->
         # finish the game if the killer was chosen
-        game |> lose(now_guessing)
+        lose(game, now_guessing)
 
       _ ->
         # otherwise, advance to the next round
-        game |> next_round()
+        next_round(game)
     end
   end
 
@@ -81,19 +81,21 @@ defmodule Secretwords.GameState do
   end
 
   def lose(game, team) do
-    game |> win(other_team(team))
+    win(game, other_team(team))
   end
 
   @spec choose_word(t, String.t()) :: t
   def choose_word(game, word) do
     new_words =
-      game.word_slots
-      |> Enum.map(fn ws ->
-        case ws.word == word do
-          true -> %{ws | used: true}
-          false -> ws
+      Enum.map(
+        game.word_slots,
+        fn ws ->
+          case ws.word == word do
+            true -> %{ws | used: true}
+            false -> ws
+          end
         end
-      end)
+      )
 
     game
     |> update_words(new_words)
@@ -104,7 +106,7 @@ defmodule Secretwords.GameState do
   def update_words(game, new_words), do: %{game | word_slots: new_words}
 
   @spec find_slot(t, String.t()) :: WordSlot.t()
-  def find_slot(game, word), do: game.word_slots |> Enum.find(&(&1.word == word))
+  def find_slot(game, word), do: Enum.find(game.word_slots, &(&1.word == word))
 
   @spec update_points(t, :blue | :killer | :neutral | :red) :: t
   def update_points(game, chosen_slot_type) do
@@ -114,10 +116,10 @@ defmodule Secretwords.GameState do
 
       :killer ->
         # finish the game if the killer was chosen
-        game |> lose(game.now_guessing)
+        lose(game, game.now_guessing)
 
       color when color in [:red, :blue] ->
-        game |> add_point(color)
+        add_point(game, color)
     end
   end
 
@@ -130,13 +132,11 @@ defmodule Secretwords.GameState do
   end
 
   defp check_end(game) do
-    winning_team_points =
-      game.points
-      |> Enum.find(fn {_team, points} -> points == @max_points end)
+    winning_team_points = Enum.find(game.points, fn {_team, points} -> points == @max_points end)
 
     case winning_team_points do
       nil -> game
-      {winning_team, @max_points} -> game |> win(winning_team)
+      {winning_team, @max_points} -> win(game, winning_team)
     end
   end
 
@@ -154,10 +154,10 @@ defmodule Secretwords.GameState do
 
   @spec ensure_membership(t, String.t()) :: t
   def ensure_membership(game, user_id) do
-    if game.round > 0 or game |> is_player(user_id) do
+    if game.round > 0 or is_player(game, user_id) do
       game
     else
-      game |> join(Enum.random([:red, :blue]), user_id)
+      join(game, Enum.random([:red, :blue]), user_id)
     end
   end
 
@@ -168,7 +168,7 @@ defmodule Secretwords.GameState do
   def is_player(game, user_id), do: user_id in all_user_ids(game)
 
   @spec all_leaders(t) :: [String.t()]
-  def all_leaders(game), do: game.leaders |> Map.values()
+  def all_leaders(game), do: Map.values(game.leaders)
 
   @spec all_user_ids(t) :: [String.t()]
   def all_user_ids(game), do: game.teams |> Map.values() |> List.flatten()
@@ -225,7 +225,7 @@ defmodule Secretwords.GameState do
       |> Enum.reject(fn {_, members} -> is_nil(members) end)
       |> Map.new()
 
-    game |> set_leaders(new_leaders)
+    set_leaders(game, new_leaders)
   end
 
   @spec determine_leader(String.t(), [String.t()]) :: String.t()

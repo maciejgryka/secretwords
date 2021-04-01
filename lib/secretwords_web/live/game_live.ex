@@ -61,7 +61,7 @@ defmodule SecretwordsWeb.GameLive do
 
   def handle_event("choose_word", %{"word" => word}, socket) do
     game = GameState.get_or_create_game(socket.assigns.game.id)
-    chosen_slot = game |> GameState.find_slot(word)
+    chosen_slot = GameState.find_slot(game, word)
 
     game
     |> GameState.choose_word(word)
@@ -82,9 +82,7 @@ defmodule SecretwordsWeb.GameLive do
   end
 
   def handle_event("update_username", %{"value" => username}, socket) do
-    user =
-      %User{id: socket.assigns.user_id, name: username}
-      |> User.update_user()
+    user = User.update_user(%User{id: socket.assigns.user_id, name: username})
 
     socket =
       socket
@@ -108,13 +106,8 @@ defmodule SecretwordsWeb.GameLive do
   end
 
   def handle_info({:user_updated, user_id, user_name}, socket) do
-    updated_users = socket.assigns.usernames |> Map.put(user_id, user_name)
-
-    socket =
-      socket
-      |> assign(:usernames, updated_users)
-
-    {:noreply, socket}
+    updated_users = Map.put(socket.assigns.usernames, user_id, user_name)
+    {:noreply, assign(socket, :usernames, updated_users)}
   end
 
   defp update_and_assign(socket, game) do
@@ -124,8 +117,8 @@ defmodule SecretwordsWeb.GameLive do
   end
 
   defp derived_state(game, user_id) do
-    is_leader = game |> GameState.is_leader(user_id)
-    is_player = game |> GameState.is_player(user_id)
+    is_leader = GameState.is_leader(game, user_id)
+    is_player = GameState.is_player(game, user_id)
     now_guessing = GameState.membership(game, user_id) == game.now_guessing
     is_game_started = game.round > 0
     is_game_finished = GameState.finished(game)

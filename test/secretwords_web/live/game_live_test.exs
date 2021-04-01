@@ -7,7 +7,7 @@ defmodule SecretwordsWeb.GameLiveTest do
   alias SecretwordsWeb.GameLive
 
   test "renders the game", %{conn: conn} do
-    conn = conn |> setup_conn()
+    conn = setup_conn(conn)
     game_id = conn.assigns.game.id
 
     {:ok, _view, html} = live(conn, "/g/" <> game_id)
@@ -25,7 +25,7 @@ defmodule SecretwordsWeb.GameLiveTest do
 
   describe "selecting a word" do
     test "marks the word as used", %{conn: conn} do
-      conn = conn |> setup_conn()
+      conn = setup_conn(conn)
       game_id = conn.assigns.game.id
       {:ok, view, _html} = live(conn, Routes.live_path(conn, GameLive, game_id))
 
@@ -43,7 +43,7 @@ defmodule SecretwordsWeb.GameLiveTest do
     end
 
     test "adds points to the right teams", %{conn: conn} do
-      conn = conn |> setup_conn()
+      conn = setup_conn(conn)
       game_id = conn.assigns.game.id
       {:ok, view, _html} = live(conn, Routes.live_path(conn, GameLive, game_id))
 
@@ -58,7 +58,7 @@ defmodule SecretwordsWeb.GameLiveTest do
     end
 
     test "does not advance the round on a corect guess", %{conn: conn} do
-      conn = conn |> setup_conn()
+      conn = setup_conn(conn)
       game_id = conn.assigns.game.id
       {:ok, view, _html} = live(conn, Routes.live_path(conn, GameLive, game_id))
 
@@ -70,7 +70,7 @@ defmodule SecretwordsWeb.GameLiveTest do
     end
 
     test "advances the round on a wrong guess", %{conn: conn} do
-      conn = conn |> setup_conn()
+      conn = setup_conn(conn)
       game_id = conn.assigns.game.id
       {:ok, view, _html} = live(conn, Routes.live_path(conn, GameLive, game_id))
 
@@ -91,8 +91,8 @@ defmodule SecretwordsWeb.GameLiveTest do
 
   defp setup_conn(conn) do
     # do a `get` to set up the endpoint, init session etc.
-    conn = conn |> get("/")
-    user_id = conn |> get_session("user_id")
+    conn = get(conn, "/")
+    user_id = get_session(conn, "user_id")
     game_id = unique_identifier(conn)
 
     game =
@@ -110,6 +110,6 @@ defmodule SecretwordsWeb.GameLiveTest do
         ]
       })
 
-    conn |> assign(:game, game)
+    assign(conn, :game, game)
   end
 end

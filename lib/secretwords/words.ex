@@ -19,7 +19,7 @@ defmodule Secretwords.Words do
   end
 
   def word_slot_types do
-    [
+    Enum.shuffle([
       :neutral,
       :neutral,
       :neutral,
@@ -45,8 +45,7 @@ defmodule Secretwords.Words do
       :blue,
       :blue,
       :killer
-    ]
-    |> Enum.shuffle()
+    ])
   end
 
   def all_words do

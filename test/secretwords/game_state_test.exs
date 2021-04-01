@@ -31,7 +31,7 @@ defmodule Secretwords.GameStateTest do
 
   describe "join" do
     test "joins the right team" do
-      game = %GameState{} |> GameState.join(:red, "member1")
+      game = GameState.join(%GameState{}, :red, "member1")
       assert game.teams[:red] == ["member1"]
     end
 
@@ -189,8 +189,10 @@ defmodule Secretwords.GameStateTest do
 
     test "doesn't add the user to any team if they're already a member" do
       updated_teams =
-        (%GameState{teams: %{red: ["u1", "u3"], blue: ["u2"]}}
-         |> GameState.ensure_membership("u3")).teams
+        GameState.ensure_membership(
+          %GameState{teams: %{red: ["u1", "u3"], blue: ["u2"]}},
+          "u3"
+        ).teams
 
       assert updated_teams == %{red: ["u1", "u3"], blue: ["u2"]}
     end

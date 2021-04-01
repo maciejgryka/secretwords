@@ -19,7 +19,7 @@ defmodule Secretwords.Plugs.SetUser do
           name: user_id
         })
 
-        conn |> put_session("user_id", user_id)
+        put_session(conn, "user_id", user_id)
 
       user_id ->
         case User.get_user(user_id) do
