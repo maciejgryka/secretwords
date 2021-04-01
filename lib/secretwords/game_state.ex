@@ -68,7 +68,7 @@ defmodule Secretwords.GameState do
         # finish the game if the killer was chosen
         lose(game, now_guessing)
 
-      _ ->
+      _slot_type ->
         # otherwise, advance to the next round
         next_round(game)
     end

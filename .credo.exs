@@ -14,6 +14,7 @@
         # {Credo.Check.Readability.Specs, []},
         {Credo.Check.Readability.AliasAs, []},
         {Credo.Check.Readability.SinglePipe, []},
+        {Credo.Check.Consistency.UnusedVariableNames, []},
 
         # disabled checks
         {Credo.Check.Readability.ModuleDoc, false}

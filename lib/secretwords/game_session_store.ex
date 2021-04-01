@@ -5,9 +5,9 @@ defmodule Secretwords.GameSessionStore do
 
   @name __MODULE__
 
-  def start_link(_), do: GenServer.start_link(__MODULE__, [], name: @name)
+  def start_link(_params), do: GenServer.start_link(__MODULE__, [], name: @name)
 
-  def init(_) do
+  def init(_params) do
     :ets.new(:game_sessions, [:set, :public, :named_table])
     {:ok, "game_sessions ets created"}
   end
