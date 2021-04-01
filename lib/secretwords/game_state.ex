@@ -3,7 +3,7 @@ defmodule Secretwords.GameState do
   Implementation of the main game logic.
   """
 
-  alias Secretwords.{User, Words}
+  alias Secretwords.{GameStore, User, Words}
 
   defstruct id: "",
             word_slots: [],
@@ -288,7 +288,7 @@ defmodule Secretwords.GameState do
   def get_or_create_game(game_id) do
     grid_size = 5
 
-    case :ets.lookup(:game_sessions, game_id) do
+    case GameStore.get(game_id) do
       [{_game_id, state}] ->
         state
 
@@ -302,7 +302,7 @@ defmodule Secretwords.GameState do
   end
 
   def update_game(game) do
-    true = :ets.insert(:game_sessions, {game.id, game})
+    true = GameStore.update(game)
     :ok = Phoenix.PubSub.broadcast!(Secretwords.PubSub, game.id, {:game_updated, game.id})
     game
   end

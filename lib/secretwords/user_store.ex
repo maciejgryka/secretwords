@@ -11,4 +11,12 @@ defmodule Secretwords.UserStore do
     :ets.new(:users, [:set, :public, :named_table])
     {:ok, "users ets created"}
   end
+
+  def get(user_id) do
+    :ets.lookup(:users, user_id)
+  end
+
+  def update(user) do
+    :ets.insert(:users, {user.id, user})
+  end
 end

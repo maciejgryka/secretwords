@@ -15,7 +15,7 @@ defmodule Secretwords.Application do
       SecretwordsWeb.Endpoint,
       # Start a worker by calling: Secretwords.Worker.start_link(arg)
       # {Secretwords.Worker, arg}
-      Secretwords.GameSessionStore,
+      Secretwords.GameStore,
       Secretwords.UserStore
     ]
 
