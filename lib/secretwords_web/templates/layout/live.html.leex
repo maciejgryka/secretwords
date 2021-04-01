@@ -2,7 +2,7 @@
   <div class="hidden sm:inline col-span-0 sm:col-span-1"></div>
   <h1 class="col-span-5 sm:col-span-4 text-5xl font-bold sm:text-center">Secretwords</h1>
   <span class="col-span-1 text-right">
-    <%= if !@d.is_game_started && @user != nil do %>
+    <%= if !@d.is_game_in_progress && @user != nil do %>
       <div class="username mt-2">
           <input
               id="input-username"

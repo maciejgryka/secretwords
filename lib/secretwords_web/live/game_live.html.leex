@@ -1,7 +1,6 @@
 <div id="game-controls" class="mt-6 mx-3">
     <span id="sharing-link" class="p-2 border border-gray-200 rounded-md shadow-xs bg-gray-200 text-sm">
         http://words.gryka.net/g/<%= @game.id %>
-        <%# <span class="ml-2 pl-2 inline-block border-l border-gray-500 h-full cursor-pointer">C</span> %>
     </span>
     <button class="btn float-right" phx-click="leave">Leave</button>
     <button class="btn float-right mr-2" phx-click="reset_game">Reset Game</button>
@@ -11,17 +10,17 @@
     <%= if @d.is_game_finished do %>
         GAME OVER
     <% else %>
-        <%= if @d.is_game_started do %>
+        <%= if @d.is_game_in_progress do %>
             Round <%= @game.round %>
         <% end %>
     <% end %>
 </h3>
 
-<% show_controls = @d.is_game_started && @d.has_control %>
+<% show_controls = @d.is_game_in_progress && @d.has_control %>
 
 <div class="mx-3 mt-4 w-full text-center">
     <%= if @d.enough_members do %>
-        <%= if !(@d.is_game_started || @d.is_game_finished) do %>
+        <%= if !(@d.is_game_in_progress || @d.is_game_finished) do %>
             <button id="next-round" class="btn"
                 <%= if @d.enough_members do %>
                     phx-click="next_round"
@@ -53,7 +52,7 @@
                 <%= if ws.used do %>
                     word-used
                 <% end %>
-                <%= if @d.is_game_started && (@d.is_leader or ws.used) do %>
+                <%= if @d.is_game_in_progress && (@d.is_leader or ws.used) do %>
                     word-<%= ws.type %>
                 <% end %>
                 <%= if is_word_active do %>
@@ -77,8 +76,12 @@
         <div class="
             p-2
             mt-4
-            <%= if @d.is_game_started && team == @game.now_guessing do %>
-                guessing-<%= team %>
+            <%= if @d.is_game_in_progress && team == @game.now_guessing do %>
+                <%= if team == :blue do %>
+                    guessing-blue
+                <% else %>
+                    guessing-red
+                <% end %>
             <% end %>
         ">
             <% team_name = team |> Atom.to_string  %>
@@ -86,23 +89,27 @@
                 text-xl
                 font-semibold
                 text-center
-                leader-name-<%= team %>
+                <%= if team == :blue do %>
+                    leader-name-blue
+                <% else %>
+                    leader-name-red
+                <% end %>
             ">
                 <%= @usernames[@game.leaders[team]] %>
-                <%= if !(@d.is_game_started || @d.is_game_finished) && @user != nil && @game.leaders[team] == @user.id do %>
+                <%= if !(@d.is_game_in_progress || @d.is_game_finished) && @user != nil && @game.leaders[team] == @user.id do %>
                     <button class="btn" phx-click="switch_teams">Switch teams</button>
                 <% end %>
                 <br>
-                <span id="points-<%= team %>"><%= @game.points[team] %></span>
+                <span id="<%= if team == :blue do %>points-blue<% else %>points-red<% end %>"><%= @game.points[team] %></span>
             </h3>
-            <ul class="member-list <%= team_name %> mt-2">
+            <ul class="<%= team_name %> mt-2">
                 <%= for member <- Enum.sort(members) do %>
                     <%= if member != @game.leaders[team] do %>
                         <li class="member">
                             <%= @usernames[member] %>
                             <%= if member == @user_id do %>
                                 (you)
-                                <%= if !(@d.is_game_started || @d.is_game_finished) do %>
+                                <%= if !(@d.is_game_in_progress || @d.is_game_finished) do %>
                                     <button class="btn" phx-click="switch_teams">Switch teams</button>
                                 <% end %>
                             <% end %>
@@ -110,7 +117,7 @@
                     <% end %>
                 <% end %>
             </ul>
-            <%= if @d.is_game_started && @d.has_control && Enum.member?(@game.teams[team], @user.id) do %>
+            <%= if @d.is_game_in_progress && @d.has_control && Enum.member?(@game.teams[team], @user.id) do %>
                 <button class="btn mt-6 w-full" id="next-round" phx-click="next_round">
                     Finish round
                 </button>

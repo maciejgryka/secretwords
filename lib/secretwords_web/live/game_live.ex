@@ -134,7 +134,7 @@ defmodule SecretwordsWeb.GameLive do
       is_leader: is_leader,
       is_player: is_player,
       now_guessing: now_guessing,
-      is_game_started: is_game_started && !is_game_finished,
+      is_game_in_progress: is_game_started && !is_game_finished,
       is_game_finished: is_game_finished,
       has_control: is_player && !is_leader && now_guessing && is_game_started,
       enough_members:
