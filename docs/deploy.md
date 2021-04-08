@@ -10,11 +10,6 @@ MIX_ENV=prod mix release --overwrite
 rsync -r _build/prod/rel/secretwords worde:~/srv/
 ```
 
-# copy the release over
-
-- `rsync -r _build/prod/rel/secretwords worde:~/srv/`
-- on the server `~/srv/secretwords/bin/secretwords restart`
-
 # Notes
 
 ## The asset pipeline
