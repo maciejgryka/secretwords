@@ -1,5 +1,6 @@
 module.exports = {
   purge: {
+    mode: 'jit',
     layers: ['base', 'utilities'],
     content: [
       '../lib/**/*.ex',

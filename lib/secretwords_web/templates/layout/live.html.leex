@@ -1,22 +1,37 @@
-<header class="mt-4 mx-3 grid grid-cols-6">
-  <div class="hidden sm:inline col-span-0 sm:col-span-1"></div>
-  <h1 class="col-span-5 sm:col-span-4 text-5xl font-bold sm:text-center">Secretwords</h1>
-  <span class="col-span-1 text-right">
-    <%= if !@d.is_game_in_progress && @user != nil do %>
-      <div class="username mt-2">
-          <input
-              id="input-username"
-              class="p-1 max-w-full outline-none border cursor-pointer rounded-md focus:border-blue-300 text-center"
-              type="text"
-              name="username"
-              value="<%= @user.name %>"
-              phx-keydown="update_username"
-              phx-debounce="200"
-          >
+<header class="bg-white">
+  <div class="bg-white">
+    <nav class="bg-white border-b border-gray-200">
+      <div class="mx-auto px-4 lg:px-0">
+        <div class="flex justify-between h-16">
+          <div class="flex">
+            <div class="flex-shrink-0 flex items-center">
+              <div class="text-2xl font-bold">
+                <%= live_patch "Secretwords", to: Routes.page_path(@socket, :index) %>
+              </div>
+            </div>
+          </div>
+
+          <div class="hidden sm:ml-6 sm:flex sm:items-center">
+            <%= if !@d.is_game_in_progress && @user != nil do %>
+              <div class="username mt-2">
+                  <input
+                      id="input-username"
+                      class="p-1 max-w-full outline-none border cursor-pointer rounded-md focus:border-blue-300 text-center"
+                      type="text"
+                      name="username"
+                      value="<%= @user.name %>"
+                      phx-keydown="update_username"
+                      phx-debounce="200"
+                  >
+              </div>
+          <% end %>
+          </div>
+        </div>
       </div>
-  <% end %>
-  </span>
+    </nav>
+  </div>
 </header>
+
 <main role="main" class="">
   <p class="alert alert-info" role="alert"
     phx-click="lv:clear-flash"
