@@ -5,27 +5,35 @@
         <div class="flex justify-between h-16">
           <div class="flex">
             <div class="flex-shrink-0 flex items-center">
-              <div class="text-2xl font-bold">
+              <h1 class="text-2xl font-bold">
                 <%= live_patch "Secretwords", to: Routes.page_path(@socket, :index) %>
-              </div>
+              </h1>
             </div>
           </div>
 
-          <div class="hidden sm:ml-6 sm:flex sm:items-center">
-            <%= if !@d.is_game_in_progress && @user != nil do %>
-              <div class="username mt-2">
-                  <input
-                      id="input-username"
-                      class="p-1 max-w-full outline-none border cursor-pointer rounded-md focus:border-blue-300 text-center"
-                      type="text"
-                      name="username"
-                      value="<%= @user.name %>"
-                      phx-keydown="update_username"
-                      phx-debounce="200"
+          <%= if !@d.is_game_in_progress && @user != nil do %>
+            <div class="flex w-48">
+              <div class="mt-3">
+                <label for="input-username" class="sr-only">Username</label>
+                <div class="relative text-gray-400 focus-within:text-gray-600">
+                  <div class="pointer-events-none absolute inset-y-0 left-0 pl-3 flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    </svg>
+                  </div>
+                  <input id="input-username"
+                        class="text-center block w-full bg-white py-2 pl-10 pr-3 border border-transparent rounded-md leading-5 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-blue-600 focus:ring-white focus:border-white sm:text-sm"
+                        ftype="text"
+                        placeholder="Username"
+                        name="username"
+                        value="<%= @user.name %>"
+                        phx-keydown="update_username"
+                        phx-debounce="200"
                   >
+                </div>
               </div>
+            </div>
           <% end %>
-          </div>
         </div>
       </div>
     </nav>

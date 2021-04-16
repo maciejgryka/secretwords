@@ -1,14 +1,11 @@
 module.exports = {
-  purge: {
-    mode: 'jit',
-    layers: ['base', 'utilities'],
-    content: [
-      '../lib/**/*.ex',
-      '../lib/**/*.leex',
-      '../lib/**/*.eex',
-      './js/**/*.js'
-    ],
-  },
+  mode: 'jit',
+  purge: [
+    '../lib/**/*.ex',
+    '../lib/**/*.leex',
+    '../lib/**/*.eex',
+    './js/**/*.js'
+  ],
   darkMode: false, // or 'media' or 'class'
   theme: {
     extend: {},
@@ -16,5 +13,7 @@ module.exports = {
   variants: {
     extend: {},
   },
-  plugins: [],
+  plugins: [
+    require('@tailwindcss/forms'),
+  ],
 }
