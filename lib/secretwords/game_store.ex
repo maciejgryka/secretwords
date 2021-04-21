@@ -18,7 +18,7 @@ defmodule Secretwords.GameStore do
     :ets.lookup(:game_sessions, game_id)
   end
 
-  def get_or_create_game(game_id) do
+  def get_or_create(game_id) do
     grid_size = 5
 
     case __MODULE__.get(game_id) do

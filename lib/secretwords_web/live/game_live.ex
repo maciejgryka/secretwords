@@ -17,7 +17,7 @@ defmodule SecretwordsWeb.GameLive do
     user_id = session["user_id"]
 
     game =
-      GameStore.get_or_create_game(game_id)
+      GameStore.get_or_create(game_id)
       |> GameState.ensure_membership(user_id)
       |> GameStore.update()
 
@@ -37,7 +37,7 @@ defmodule SecretwordsWeb.GameLive do
 
   def handle_event("switch_teams", _value, socket) do
     game =
-      GameStore.get_or_create_game(socket.assigns.game.id)
+      GameStore.get_or_create(socket.assigns.game.id)
       |> GameState.switch_teams(socket.assigns.user_id)
       |> GameStore.update()
 
@@ -46,7 +46,7 @@ defmodule SecretwordsWeb.GameLive do
 
   def handle_event("leave", _params, socket) do
     game =
-      GameStore.get_or_create_game(socket.assigns.game.id)
+      GameStore.get_or_create(socket.assigns.game.id)
       |> GameState.leave(:red, socket.assigns.user_id)
       |> GameState.leave(:blue, socket.assigns.user_id)
       |> GameStore.update()
@@ -60,7 +60,7 @@ defmodule SecretwordsWeb.GameLive do
   end
 
   def handle_event("choose_word", %{"word" => word}, socket) do
-    game = GameStore.get_or_create_game(socket.assigns.game.id)
+    game = GameStore.get_or_create(socket.assigns.game.id)
     chosen_slot = GameState.find_slot(game, word)
 
     game
@@ -74,7 +74,7 @@ defmodule SecretwordsWeb.GameLive do
 
   def handle_event("next_round", _value, socket) do
     game =
-      GameStore.get_or_create_game(socket.assigns.game.id)
+      GameStore.get_or_create(socket.assigns.game.id)
       |> GameState.next_round()
       |> GameStore.update()
 
@@ -94,7 +94,7 @@ defmodule SecretwordsWeb.GameLive do
 
   def handle_event("reset_game", _value, socket) do
     game =
-      GameStore.get_or_create_game(socket.assigns.game.id)
+      GameStore.get_or_create(socket.assigns.game.id)
       |> GameState.reset()
       |> GameStore.update()
 
@@ -102,7 +102,7 @@ defmodule SecretwordsWeb.GameLive do
   end
 
   def handle_info({:game_updated, game_id}, socket) do
-    {:noreply, update_and_assign(socket, GameStore.get_or_create_game(game_id))}
+    {:noreply, update_and_assign(socket, GameStore.get_or_create(game_id))}
   end
 
   def handle_info({:user_updated, user_id, user_name}, socket) do
