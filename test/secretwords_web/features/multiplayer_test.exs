@@ -3,7 +3,7 @@ defmodule SecretwordsWeb.Features.MultiplayerTest do
   use Wallaby.Feature
   alias Wallaby.Query
 
-  alias Secretwords.GameState
+  alias Secretwords.{GameState, GameStore}
 
   @start_button Query.button("Start game")
   @switch_teams Query.button("Switch teams")
@@ -19,8 +19,8 @@ defmodule SecretwordsWeb.Features.MultiplayerTest do
 
     # make sure game exists in ets
     game_id
-    |> GameState.get_or_create_game()
-    |> GameState.update_game()
+    |> GameStore.get_or_create_game()
+    |> GameStore.update()
 
     game_path = Routes.live_path(@endpoint, SecretwordsWeb.GameLive, game_id)
 
@@ -54,16 +54,16 @@ defmodule SecretwordsWeb.Features.MultiplayerTest do
       blue = [blue_leader | _]
     ] =
       game_id
-      |> GameState.get_or_create_game()
+      |> GameStore.get_or_create_game()
       |> GameState.all_user_ids()
       |> Enum.chunk_every(2)
 
     # set up team membership predictably
     game_id
-    |> GameState.get_or_create_game()
+    |> GameStore.get_or_create_game()
     |> Map.put(:teams, %{red: red, blue: blue})
     |> Map.put(:leaders, %{red: red_leader, blue: blue_leader})
-    |> GameState.update_game()
+    |> GameStore.update()
 
     player2
     |> refute_has(@round)

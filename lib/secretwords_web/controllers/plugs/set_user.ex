@@ -4,7 +4,7 @@ defmodule Secretwords.Plugs.SetUser do
   """
   import Plug.Conn
 
-  alias Secretwords.{Helpers, User}
+  alias Secretwords.{Helpers, User, UserStore}
 
   def init(_params) do
   end
@@ -14,7 +14,7 @@ defmodule Secretwords.Plugs.SetUser do
       nil ->
         user_id = Helpers.random_string()
 
-        User.update_user(%User{
+        UserStore.update(%User{
           id: user_id,
           name: user_id
         })
@@ -22,10 +22,10 @@ defmodule Secretwords.Plugs.SetUser do
         put_session(conn, "user_id", user_id)
 
       user_id ->
-        case User.get_user(user_id) do
+        case UserStore.get(user_id) do
           nil ->
             # the user_id in the session has no equivalent in ets, create a new user
-            User.update_user(%User{
+            UserStore.update(%User{
               id: user_id,
               name: user_id
             })

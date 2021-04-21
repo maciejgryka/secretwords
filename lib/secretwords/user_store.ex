@@ -13,10 +13,18 @@ defmodule Secretwords.UserStore do
   end
 
   def get(user_id) do
-    :ets.lookup(:users, user_id)
+    case :ets.lookup(:users, user_id) do
+      [] -> nil
+      [{^user_id, user}] -> user
+    end
   end
 
   def update(user) do
-    :ets.insert(:users, {user.id, user})
+    true = :ets.insert(:users, {user.id, user})
+
+    :ok =
+      Phoenix.PubSub.broadcast!(Secretwords.PubSub, "users", {:user_updated, user.id, user.name})
+
+    user
   end
 end
