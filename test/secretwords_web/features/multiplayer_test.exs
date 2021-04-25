@@ -61,7 +61,7 @@ defmodule SecretwordsWeb.Features.MultiplayerTest do
     # set up team membership predictably
     game_id
     |> GameStore.get_or_create()
-    |> Map.put(:teams, %{red: red, blue: blue})
+    |> Map.put(:teams, %{red: MapSet.new(red), blue: MapSet.new(blue)})
     |> Map.put(:leaders, %{red: red_leader, blue: blue_leader})
     |> GameStore.update()
 

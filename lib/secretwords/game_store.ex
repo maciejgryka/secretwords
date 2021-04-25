@@ -22,8 +22,8 @@ defmodule Secretwords.GameStore do
     grid_size = 5
 
     case __MODULE__.get(game_id) do
-      [{_game_id, state}] ->
-        state
+      [{_game_id, game}] ->
+        game
 
       [] ->
         %GameState{

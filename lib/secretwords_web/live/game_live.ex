@@ -133,7 +133,7 @@ defmodule SecretwordsWeb.GameLive do
       enough_members:
         game.teams
         |> Map.values()
-        |> Enum.map(&length/1)
+        |> Enum.map(&MapSet.size/1)
         |> Enum.min() >= @min_players
     }
   end

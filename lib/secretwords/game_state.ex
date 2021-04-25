@@ -8,7 +8,7 @@ defmodule Secretwords.GameState do
   defstruct id: "",
             word_slots: [],
             grid_size: 5,
-            teams: %{red: [], blue: []},
+            teams: %{red: MapSet.new(), blue: MapSet.new()},
             points: %{red: 0, blue: 0},
             leaders: %{},
             round: 0,
@@ -47,7 +47,6 @@ defmodule Secretwords.GameState do
   @spec next_round(t) :: t
   def next_round(game) do
     new_round = game.round + 1
-
     new_guessing = other_team(game.now_guessing)
 
     game
@@ -68,7 +67,7 @@ defmodule Secretwords.GameState do
         # finish the game if the killer was chosen
         lose(game, now_guessing)
 
-      _slot_type ->
+      _other_or_neutral ->
         # otherwise, advance to the next round
         next_round(game)
     end
@@ -171,7 +170,12 @@ defmodule Secretwords.GameState do
   def all_leaders(game), do: Map.values(game.leaders)
 
   @spec all_user_ids(t) :: [String.t()]
-  def all_user_ids(game), do: game.teams |> Map.values() |> List.flatten()
+  def all_user_ids(game) do
+    game.teams
+    |> Map.values()
+    |> Enum.map(&MapSet.to_list/1)
+    |> List.flatten()
+  end
 
   def all_users(game) do
     game
@@ -182,37 +186,27 @@ defmodule Secretwords.GameState do
 
   @spec join(t, atom, String.t()) :: t
   def join(game, color, user_id) do
-    current_members = Map.get(game.teams, color, [])
-    updated_members = Enum.uniq([user_id | current_members])
-    message = "#{User.name(user_id)} joined the #{color} team"
-
     game
     # log joining first, because update_members logs leadership changes
-    |> log_activity(message)
-    |> update_members(color, updated_members)
+    |> log_activity("#{User.name(user_id)} joined the #{color} team")
+    |> update_members(color, MapSet.put(game.teams[color], user_id))
   end
 
   @spec leave(t, atom, String.t()) :: t
   def leave(game, color, user_id) do
-    current_members = game.teams[color]
-    updated_members = Enum.reject(current_members, &(&1 == user_id))
-
-    if updated_members != current_members do
-      message = "#{User.name(user_id)} left the #{color} team"
-
-      game
-      # log leaving first, because update_members logs leadership changes
-      |> log_activity(message)
-      |> update_members(color, updated_members)
-    else
-      game
-    end
+    game
+    # log leaving first, because update_members logs leadership changes
+    |> log_activity("#{User.name(user_id)} left the #{color} team")
+    |> update_members(color, MapSet.delete(game.teams[color], user_id))
   end
 
-  @spec update_members(t, atom, [String.t()]) :: t
+  @spec update_members(t, atom, MapSet.t()) :: t
   defp update_members(game, color, new_members) do
     updated_teams = Map.put(game.teams, color, new_members)
-    game |> Map.put(:teams, updated_teams) |> ensure_leaders()
+
+    game
+    |> Map.put(:teams, updated_teams)
+    |> ensure_leaders()
   end
 
   @spec ensure_leaders(t) :: t
@@ -228,18 +222,18 @@ defmodule Secretwords.GameState do
     set_leaders(game, new_leaders)
   end
 
-  @spec determine_leader(String.t(), [String.t()]) :: String.t()
+  @spec determine_leader(String.t(), MapSet.t()) :: String.t()
   defp determine_leader(current_leader, members) do
-    case length(members) > 0 do
-      true ->
-        if is_nil(current_leader) or !(current_leader in members) do
-          List.first(members)
+    case MapSet.size(members) do
+      0 ->
+        nil
+
+      _num_members ->
+        if is_nil(current_leader) or current_leader not in members do
+          Enum.at(members, 0)
         else
           current_leader
         end
-
-      false ->
-        nil
     end
   end
 

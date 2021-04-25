@@ -100,7 +100,7 @@ defmodule SecretwordsWeb.GameLiveTest do
         id: game_id,
         now_guessing: :red,
         round: 1,
-        teams: %{red: ["u1", user_id], blue: ["u3, u4"]},
+        teams: %{red: MapSet.new(["u1", user_id]), blue: MapSet.new(["u3, u4"])},
         leaders: %{red: "u1", blue: "u3"},
         points: %{red: 0, blue: 0},
         word_slots: [

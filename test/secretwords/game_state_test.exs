@@ -32,7 +32,7 @@ defmodule Secretwords.GameStateTest do
   describe "join" do
     test "joins the right team" do
       game = GameState.join(%GameState{}, :red, "member1")
-      assert game.teams[:red] == ["member1"]
+      assert MapSet.to_list(game.teams[:red]) == ["member1"]
     end
 
     test "ensures members are unique" do
@@ -41,7 +41,7 @@ defmodule Secretwords.GameStateTest do
         |> GameState.join(:red, "member1")
         |> GameState.join(:red, "member1")
 
-      assert game.teams[:red] == ["member1"]
+      assert MapSet.to_list(game.teams[:red]) == ["member1"]
     end
 
     test "allows multiple members" do
@@ -50,29 +50,30 @@ defmodule Secretwords.GameStateTest do
         |> GameState.join(:red, "member1")
         |> GameState.join(:red, "member2")
 
-      assert game.teams[:red] == ["member2", "member1"]
+      assert "member1" in game.teams[:red]
+      assert "member2" in game.teams[:red]
     end
   end
 
   describe "leave" do
     test "leaves the team if given user is a member" do
       assert GameState.leave(
-               %GameState{teams: %{red: ["u1", "u2"], blue: ["u3"]}},
+               %GameState{teams: %{red: MapSet.new(["u1", "u2"]), blue: MapSet.new(["u3"])}},
                :red,
                "u1"
-             ).teams == %{red: ["u2"], blue: ["u3"]}
+             ).teams == %{red: MapSet.new(["u2"]), blue: MapSet.new(["u3"])}
 
       assert GameState.leave(
-               %GameState{teams: %{red: ["u1", "u2"], blue: ["u3"]}},
+               %GameState{teams: %{red: MapSet.new(["u1", "u2"]), blue: MapSet.new(["u3"])}},
                :blue,
                "u3"
-             ).teams == %{red: ["u1", "u2"], blue: []}
+             ).teams == %{red: MapSet.new(["u1", "u2"]), blue: MapSet.new()}
     end
 
     test "removes the leader when they leave" do
       assert GameState.leave(
                %GameState{
-                 teams: %{red: ["u1", "u2", "u4"], blue: ["u3"]},
+                 teams: %{red: MapSet.new(["u1", "u2", "u4"]), blue: MapSet.new(["u3"])},
                  leaders: %{red: "u1", blue: "u3"}
                },
                :red,
@@ -82,16 +83,16 @@ defmodule Secretwords.GameStateTest do
 
     test "does nothing if the given user is not a member" do
       assert GameState.leave(
-               %GameState{teams: %{red: ["u1", "u2"], blue: ["u3"]}},
+               %GameState{teams: %{red: MapSet.new(["u1", "u2"]), blue: MapSet.new(["u3"])}},
                :red,
                "u3"
-             ).teams == %{red: ["u1", "u2"], blue: ["u3"]}
+             ).teams == %{red: MapSet.new(["u1", "u2"]), blue: MapSet.new(["u3"])}
 
       assert GameState.leave(
-               %GameState{teams: %{red: ["u1", "u2"], blue: ["u3"]}},
+               %GameState{teams: %{red: MapSet.new(["u1", "u2"]), blue: MapSet.new(["u3"])}},
                :red,
                "u4"
-             ).teams == %{red: ["u1", "u2"], blue: ["u3"]}
+             ).teams == %{red: MapSet.new(["u1", "u2"]), blue: MapSet.new(["u3"])}
     end
   end
 
@@ -144,31 +145,35 @@ defmodule Secretwords.GameStateTest do
 
   describe "ensure_leaders" do
     test "makes leaders out of sole members" do
-      assert GameState.ensure_leaders(%GameState{teams: %{red: [], blue: ["u1"]}}).leaders == %{
+      assert GameState.ensure_leaders(%GameState{
+               teams: %{red: MapSet.new(), blue: MapSet.new(["u1"])}
+             }).leaders == %{
                blue: "u1"
              }
 
-      assert GameState.ensure_leaders(%GameState{teams: %{red: ["u2"], blue: ["u1"]}}).leaders ==
+      assert GameState.ensure_leaders(%GameState{
+               teams: %{red: MapSet.new(["u2"]), blue: MapSet.new(["u1"])}
+             }).leaders ==
                %{red: "u2", blue: "u1"}
     end
 
     test "removes leaders of empty tems" do
       assert GameState.ensure_leaders(%GameState{
-               teams: %{red: [], blue: ["u1"]},
+               teams: %{red: MapSet.new(), blue: MapSet.new(["u1"])},
                leaders: %{red: "u3", blue: "u1"}
              }).leaders == %{blue: "u1"}
     end
 
     test "leaves existing valid leaders" do
       assert GameState.ensure_leaders(%GameState{
-               teams: %{red: ["u1", "u2", "u3"], blue: ["u4"]},
+               teams: %{red: MapSet.new(["u1", "u2", "u3"]), blue: MapSet.new(["u4"])},
                leaders: %{red: "u2", blue: "u4"}
              }).leaders == %{red: "u2", blue: "u4"}
     end
 
     test "picks a leader for non-empty, leaderless teams" do
       assert GameState.ensure_leaders(%GameState{
-               teams: %{red: ["u1", "u2", "u3"], blue: ["u4"]},
+               teams: %{red: MapSet.new(["u1", "u2", "u3"]), blue: MapSet.new(["u4"])},
                leaders: %{blue: "u4"}
              }).leaders == %{red: "u1", blue: "u4"}
     end
@@ -190,11 +195,14 @@ defmodule Secretwords.GameStateTest do
     test "doesn't add the user to any team if they're already a member" do
       updated_teams =
         GameState.ensure_membership(
-          %GameState{teams: %{red: ["u1", "u3"], blue: ["u2"]}},
+          %GameState{teams: %{red: MapSet.new(["u1", "u3"]), blue: MapSet.new(["u2"])}},
           "u3"
         ).teams
 
-      assert updated_teams == %{red: ["u1", "u3"], blue: ["u2"]}
+      assert "u1" in updated_teams.red
+      assert "u3" in updated_teams.red
+      assert "u2" in updated_teams.blue
+      assert "u3" not in updated_teams.blue
     end
   end
 end
