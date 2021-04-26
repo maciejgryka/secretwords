@@ -51,7 +51,12 @@
                     word-used
                 <% end %>
                 <%= if @d.is_game_in_progress && (@d.is_leader or ws.used) do %>
-                    word-<%= ws.type %>
+                    <%= case ws.type do
+                        :red -> "word-red"
+                        :blue -> "word-blue"
+                        :neutral -> "word-neutral"
+                        :killer -> "word-killer"
+                    end %>
                 <% end %>
                 <%= if is_word_active do %>
                     word-selectable
